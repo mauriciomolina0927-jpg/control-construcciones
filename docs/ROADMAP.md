@@ -5,7 +5,7 @@
 | 0. Descubrimiento | Negocio, vacíos, riesgos | Terminada (2026-10-21) |
 | 1. Especificación | Módulos, pantallas, reglas, modelo de datos, 13 casos de prueba | Aprobada (2026-10-21) |
 | 2. Arquitectura | Stack, seguridad, permisos, despliegue, pruebas, repositorio | Aprobada (2026-10-21) ([doc](https://claude.ai/artifact/LFsMR6Gk3uYMzNokT5YnSC)) |
-| 3. Construcción | Incrementos usables por separado | En curso: incremento 1 |
+| 3. Construcción | Incrementos usables por separado | Incremento 1 publicado (2026-10-21); en curso: incremento 2 (WhatsApp) |
 
 ## Incrementos de la Fase 3
 

@@ -45,6 +45,16 @@ Montos en pesos enteros; el peso sobrante va al socio con mayor aporte. La liqui
 
 Reglas: `organization_id` y permisos por fila en todo; anular en vez de borrar; casa `settled` no acepta movimientos; bitácora por triggers.
 
+## WhatsApp (incremento 2)
+
+1. Meta envía cada mensaje a `/api/whatsapp`; la app revisa la firma (`WHATSAPP_APP_SECRET`), responde 200 de una vez y procesa después.
+2. `whatsapp_context` identifica al socio por su celular (los demás números se ignoran) y trae casas abiertas, sugerencias abiertas y los últimos mensajes.
+3. La foto o PDF se descarga de Meta, se revisa por contenido (máx. 4 MB) y se guarda con el mensaje (`whatsapp_record`, que ignora repetidos).
+4. Claude devuelve JSON con los gastos o la respuesta; la app valida casas, socios, categoría, valor y fecha antes de guardar con `whatsapp_suggest`.
+5. La app contesta por WhatsApp (confirmación o la pregunta que falta). Una persona confirma o descarta en Dinero › Por revisar; al confirmar se crea el gasto con origen `whatsapp` y su soporte.
+
+Variables en Vercel: `WHATSAPP_WEBHOOK_TOKEN`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `ANTHROPIC_API_KEY`. Costos de Meta y de la API de Claude: por verificar con el uso real.
+
 ## Inicio de sesión
 
 Enlace al correo la primera vez en cada celular; después PIN de 4 dígitos (cifrado, bloqueo a los 5 intentos, se pide al abrir, tras 15 min sin uso y para aprobar liquidaciones).
