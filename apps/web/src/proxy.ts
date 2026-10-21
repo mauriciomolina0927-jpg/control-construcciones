@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { pinSessionSecret, supabaseKey, supabaseUrl } from "@/lib/env";
 import { isPinSessionValid, PIN_COOKIE, pinCookieOptions, signPinSession } from "@/lib/pin-session";
 
-const PUBLIC_PATHS = ["/entrar", "/auth/callback"];
+const PUBLIC_PATHS = ["/entrar", "/auth/callback", "/auth/confirm"];
 
 /**
  * Refreshes the Supabase session and sends each request to the right door:
