@@ -1,0 +1,14 @@
+{
+  "/(app)/casas/page": "/casas",
+  "/(app)/dinero/page": "/dinero",
+  "/(app)/mas/ajustes/page": "/mas/ajustes",
+  "/(app)/mas/page": "/mas",
+  "/(app)/page": "/",
+  "/(app)/ventas/page": "/ventas",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/auth/callback/route": "/auth/callback",
+  "/entrar/page": "/entrar",
+  "/favicon.ico/route": "/favicon.ico",
+  "/pin/page": "/pin"
+}

@@ -1,0 +1,35 @@
+{
+  "node": {
+    "406ca3a19573838d83fc937de05ff49ef09f1423fe": {
+      "workers": {
+        "app/(app)/mas/ajustes/page": {
+          "moduleId": 9181,
+          "async": false
+        }
+      },
+      "exportedName": "cancelInvitation",
+      "filename": "apps/web/src/app/(app)/mas/ajustes/actions.ts"
+    },
+    "6012353249f8a18fe60a5aa3e5fc4330cc6fe5d2a8": {
+      "workers": {
+        "app/(app)/mas/ajustes/page": {
+          "moduleId": 9181,
+          "async": false
+        }
+      },
+      "exportedName": "invite",
+      "filename": "apps/web/src/app/(app)/mas/ajustes/actions.ts"
+    },
+    "60e8b34b4cd06451216538e1b7b7f4b33e831efe2b": {
+      "workers": {
+        "app/(app)/mas/ajustes/page": {
+          "moduleId": 9181,
+          "async": false
+        }
+      },
+      "exportedName": "addPartner",
+      "filename": "apps/web/src/app/(app)/mas/ajustes/actions.ts"
+    }
+  },
+  "edge": {}
+}

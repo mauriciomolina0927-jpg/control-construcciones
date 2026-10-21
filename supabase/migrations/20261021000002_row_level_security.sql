@@ -76,8 +76,9 @@ create policy partners_update on public.partners for update to authenticated
 
 -- Houses and agreements
 
+-- The role check comes first so a just-inserted house is visible to INSERT ... RETURNING.
 create policy houses_select on public.houses for select to authenticated
-  using (public.can_view_house(id));
+  using (public.role_in(organization_id) in ('admin', 'partner') or public.can_view_house(id));
 create policy houses_insert on public.houses for insert to authenticated
   with check (public.can_write(organization_id));
 create policy houses_update on public.houses for update to authenticated

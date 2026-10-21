@@ -1,0 +1,15 @@
+{
+  "node": {
+    "60cd8287f66ecff27eb22b26986abc227fc8f7b194": {
+      "workers": {
+        "app/entrar/page": {
+          "moduleId": 50646,
+          "async": false
+        }
+      },
+      "exportedName": "signInStep",
+      "filename": "apps/web/src/app/entrar/actions.ts"
+    }
+  },
+  "edge": {}
+}
