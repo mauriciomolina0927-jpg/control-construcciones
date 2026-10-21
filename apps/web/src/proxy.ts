@@ -48,6 +48,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // /api/whatsapp is called by Meta, not by a person: it checks its own signature.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|icons/|api/whatsapp).*)"],
+  // /api/whatsapp is called by Meta, not by a person: it checks its own signature. /privacidad is public for Meta.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|icons/|api/whatsapp|privacidad).*)"],
 };
