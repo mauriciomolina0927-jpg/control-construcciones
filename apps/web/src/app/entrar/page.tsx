@@ -16,7 +16,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/entrar">)
       <header className="text-center">
         <h1 className="text-2xl font-bold">Control de obra</h1>
         <p className="mt-1 text-sm text-foreground/70">
-          La primera vez en este celular entras con tu correo. Después, solo con tu PIN.
+          La primera vez en este celular entras con tu correo y contraseña. Después, solo con tu PIN.
         </p>
       </header>
       <Card>

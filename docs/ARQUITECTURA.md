@@ -57,7 +57,7 @@ Variables en Vercel: `WHATSAPP_WEBHOOK_TOKEN`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAP
 
 ## Inicio de sesión
 
-Enlace al correo la primera vez en cada celular; después PIN de 4 dígitos (cifrado, bloqueo a los 5 intentos, se pide al abrir, tras 15 min sin uso y para aprobar liquidaciones).
+Correo y contraseña la primera vez en cada celular (la persona crea su contraseña si está invitada; queda el enlace al correo como respaldo, máximo 2 correos por hora en el plan gratis); después PIN de 4 dígitos (cifrado, bloqueo a los 5 intentos, se pide al abrir, tras 15 min sin uso y para aprobar liquidaciones).
 
 ## Permisos
 

@@ -38,3 +38,4 @@ Cada decisión con fecha, qué se decidió y por qué. Las más recientes arriba
 | 2026-10-21 | `organization_id` en todas las tablas desde el inicio, sin funciones de producto aún | Bajo costo hoy, evita migración si se vuelve producto |
 
 | 2026-10-21 | El enlace del correo de entrada usa el flujo implícito y llega a `/auth/confirm` | En el plan gratis de Supabase no se puede editar el correo para poner un código, y el enlace PKCE fallaba al abrirlo en otro navegador o en el Gmail del celular |
+| 2026-10-21 | La primera entrada en cada celular es con correo y contraseña, no con el enlace al correo | El plan gratis de Supabase solo envía 2 correos por hora. Requiere apagar "Confirm email" en Supabase |

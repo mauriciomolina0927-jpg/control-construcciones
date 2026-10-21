@@ -43,7 +43,7 @@ export async function invite(_: FormState, form: FormData): Promise<FormState> {
   }
 
   revalidatePath("/mas/ajustes");
-  return { ok: `Listo. ${email} ya puede entrar con su correo.` };
+  return { ok: `Listo. ${email} ya puede entrar: la primera vez crea su contraseña.` };
 }
 
 export async function cancelInvitation(form: FormData): Promise<void> {

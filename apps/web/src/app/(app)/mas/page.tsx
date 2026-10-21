@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui";
 import { forgotPin } from "@/app/pin/actions";
 import { requireMembership } from "@/lib/membership";
+import { PasswordForm } from "./password-form";
 
 export default async function MorePage() {
   const { membership } = await requireMembership();
@@ -21,6 +22,10 @@ export default async function MorePage() {
         <form action={forgotPin}>
           <button className="block w-full px-5 py-4 text-left">Salir y cambiar de correo</button>
         </form>
+      </Card>
+      <Card className="space-y-4">
+        <h2 className="font-semibold">Contraseña</h2>
+        <PasswordForm />
       </Card>
     </div>
   );
