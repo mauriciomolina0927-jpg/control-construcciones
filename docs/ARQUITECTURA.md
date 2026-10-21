@@ -10,11 +10,11 @@ Estado: aprobada el 2026-10-21 (Fase 2).
 | Datos, usuarios, archivos | Supabase: PostgreSQL, autenticación, permisos por fila, almacenamiento | Firebase |
 | Liquidación | Funciones puras en TypeScript con pruebas (Vitest) | Vistas SQL |
 | Alojamiento | Vercel + una sola base Supabase (`control-construcciones-prueba`, us-east-1); datos ficticios en una organización "Demo" aislada; migraciones probadas en CI antes de aplicarse | Render o Railway |
-| IA | API de Claude para leer recibos; servidor MCP propio con credencial por agente | Otros OCR |
+| IA | Gemini en plan gratis para leer mensajes y recibos, con reglas fijas de respaldo; servidor MCP propio con credencial por agente | Claude (pago) |
 | WhatsApp | API oficial de WhatsApp Business (Meta), incremento 2; costos por verificar | Registro manual desde el chat |
 | Diseño 3D | glTF/GLB con `<model-viewer>`; fuentes pesadas enlazadas en Drive | Recorridos 360 |
 
-Costo estimado: ~45 USD/mes más IA (por verificar).
+Costo: planes gratis de Vercel, Supabase y Gemini (decidido el 2026-10-21). Por verificar los límites de cada plan.
 
 ## Liquidación
 
@@ -50,10 +50,10 @@ Reglas: `organization_id` y permisos por fila en todo; anular en vez de borrar; 
 1. Meta envía cada mensaje a `/api/whatsapp`; la app revisa la firma (`WHATSAPP_APP_SECRET`), responde 200 de una vez y procesa después.
 2. `whatsapp_context` identifica al socio por su celular (los demás números se ignoran) y trae casas abiertas, sugerencias abiertas y los últimos mensajes.
 3. La foto o PDF se descarga de Meta, se revisa por contenido (máx. 4 MB) y se guarda con el mensaje (`whatsapp_record`, que ignora repetidos).
-4. Claude devuelve JSON con los gastos o la respuesta; la app valida casas, socios, categoría, valor y fecha antes de guardar con `whatsapp_suggest`.
+4. Gemini (plan gratis) devuelve JSON con los gastos o la respuesta; si falla, las reglas fijas de `reader.ts` leen el texto. En ambos casos la app valida casas, socios, categoría, valor y fecha antes de guardar con `whatsapp_suggest`.
 5. La app contesta por WhatsApp (confirmación o la pregunta que falta). Una persona confirma o descarta en Dinero › Por revisar; al confirmar se crea el gasto con origen `whatsapp` y su soporte.
 
-Variables en Vercel: `WHATSAPP_WEBHOOK_TOKEN`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `ANTHROPIC_API_KEY`. Costos de Meta y de la API de Claude: por verificar con el uso real.
+Variables en Vercel: `WHATSAPP_WEBHOOK_TOKEN`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `GEMINI_API_KEY` (y opcional `GEMINI_MODEL`). Responder dentro de 24 horas en WhatsApp no tiene costo; límites del plan gratis de Gemini: por verificar.
 
 ## Inicio de sesión
 
