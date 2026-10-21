@@ -53,12 +53,19 @@ export default async function NewExpensePage({ searchParams }: PageProps<"/gasto
     : { spentOn: today, paidBy: (await cookies()).get(LAST_PAYER_COOKIE)?.value ?? me?.id };
 
   return (
-    <>
-      <header className="space-y-1">
-        <Link href="/dinero" className="text-sm text-brand">
-          ‹ Dinero
-        </Link>
-        <h1 className="text-xl font-bold">{old ? "Registrar el gasto correcto" : "Nuevo gasto"}</h1>
+    <div className="mx-auto w-full max-w-2xl space-y-4">
+      <header className="space-y-4">
+        {!old && (
+          <nav aria-label="Qué vas a registrar" className="flex rounded-full bg-soft p-1 text-sm">
+            <span aria-current="page" className="flex-1 rounded-full bg-white py-2 text-center font-medium shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
+              Gasto
+            </span>
+            <Link href="/ventas" className="flex-1 py-2 text-center text-foreground/60">
+              Abono de un comprador
+            </Link>
+          </nav>
+        )}
+        <h1 className="text-[28px] font-normal tracking-[-0.03em]">{old ? "Registrar el gasto correcto" : "Nuevo gasto"}</h1>
         {old && (
           <p className="text-sm text-foreground/60">Al guardar, el gasto anterior queda anulado y enlazado con este.</p>
         )}
@@ -70,6 +77,6 @@ export default async function NewExpensePage({ searchParams }: PageProps<"/gasto
           <ExpenseForm houses={options} defaults={defaults} today={today} />
         )}
       </Card>
-    </>
+    </div>
   );
 }

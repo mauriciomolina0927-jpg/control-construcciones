@@ -16,12 +16,12 @@ export default async function SettingsPage() {
   const partnerName = new Map((partners ?? []).map((p) => [p.id, p.name]));
 
   return (
-    <>
-      <h1 className="text-xl font-bold">Socios e invitaciones</h1>
+    <div className="mx-auto w-full max-w-2xl space-y-4">
+      <h1 className="text-[28px] font-normal tracking-[-0.03em]">Socios e invitaciones</h1>
 
       <Card className="space-y-4">
         <h2 className="font-semibold">Socios</h2>
-        <ul className="divide-y divide-black/5 text-sm dark:divide-white/10">
+        <ul className="divide-y divide-line text-sm">
           {(partners ?? []).map((p) => (
             <li key={p.id} className="flex justify-between py-2">
               <span>{p.name}</span>
@@ -38,7 +38,7 @@ export default async function SettingsPage() {
         <p className="text-sm text-foreground/70">
           Solo los correos invitados pueden entrar. La primera vez reciben un código en el correo y luego crean su PIN.
         </p>
-        <ul className="divide-y divide-black/5 text-sm dark:divide-white/10">
+        <ul className="divide-y divide-line text-sm">
           {(invitations ?? []).map((inv) => (
             <li key={inv.id} className="flex items-center justify-between gap-2 py-2">
               <span>
@@ -61,6 +61,6 @@ export default async function SettingsPage() {
         </ul>
         <InviteForm partners={(partners ?? []).filter((p) => !p.user_id)} />
       </Card>
-    </>
+    </div>
   );
 }

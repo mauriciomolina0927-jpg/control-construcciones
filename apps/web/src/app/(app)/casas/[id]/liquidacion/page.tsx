@@ -1,11 +1,12 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { HouseHeader } from "@/components/house-header";
 import { Card } from "@/components/ui";
 import { bogotaToday } from "@/lib/expenses";
 import { loadHouseFinance } from "@/lib/houses";
 import { requireMembership } from "@/lib/membership";
 import { formatPesos, toPesos } from "@/lib/money";
 import { suggestTransfers } from "@/lib/sales";
+import type { Stage } from "@/lib/stages";
 import { ApproveForm, CreateSettlementForm, TransferForm, VoidTransferForm } from "./forms";
 
 const dateTime = new Intl.DateTimeFormat("es-CO", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Bogota" });
@@ -69,13 +70,9 @@ export default async function SettlementPage({ params }: PageProps<"/casas/[id]/
 
   return (
     <>
-      <header className="space-y-1">
-        <Link href={`/casas/${id}`} className="text-sm text-brand">
-          ‹ {house.name}
-        </Link>
-        <h1 className="text-xl font-bold">Cómo se reparte</h1>
-        <p className="text-sm text-foreground/60">Con la plata recibida hasta hoy: {formatPesos(s.received)}.</p>
-      </header>
+      <HouseHeader house={{ ...house, stage: house.stage as Stage }} active="reparto" />
+      <p className="text-sm text-foreground/60">Cómo se reparte la plata recibida hasta hoy: {formatPesos(s.received)}.</p>
+      <div className="space-y-4 md:max-w-3xl">
 
       <Card className="space-y-4 text-sm">
         <Step n={1} title="Se devuelven los gastos de venta a quien los pagó" total={s.partners.reduce((a, p) => a + p.saleCostsReimbursed, 0n)}>
@@ -145,7 +142,7 @@ export default async function SettlementPage({ params }: PageProps<"/casas/[id]/
           })
         )}
         {(transfers ?? []).length > 0 && (
-          <ul className="divide-y divide-black/5 text-sm dark:divide-white/10">
+          <ul className="divide-y divide-line text-sm">
             {(transfers ?? []).map((t) => (
               <li key={t.id} className={`space-y-1 py-2 ${t.status === "voided" ? "opacity-60" : ""}`}>
                 <div className="flex justify-between gap-2">
@@ -203,6 +200,7 @@ export default async function SettlementPage({ params }: PageProps<"/casas/[id]/
         )}
         {membership?.role === "admin" && !settled && <CreateSettlementForm houseId={id} disabledReason={disabledReason} />}
       </Card>
+      </div>
     </>
   );
 }
@@ -210,7 +208,7 @@ export default async function SettlementPage({ params }: PageProps<"/casas/[id]/
 function Step({ n, title, total, children }: { n: number; title: string; total: bigint; children: React.ReactNode }) {
   return (
     <div className="flex gap-3">
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand/10 font-semibold text-brand">{n}</span>
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-soft text-sm font-medium">{n}</span>
       <div className="flex-1">
         <p className="flex justify-between gap-2 font-medium">
           <span>{title}</span>
