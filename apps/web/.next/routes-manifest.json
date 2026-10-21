@@ -39,12 +39,28 @@
       "namedRegex": "^/casas/(?<nxtPid>[^/]+?)/actividad(?:/)?$"
     },
     {
+      "page": "/casas/[id]/liquidacion",
+      "regex": "^/casas/([^/]+?)/liquidacion(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/casas/(?<nxtPid>[^/]+?)/liquidacion(?:/)?$"
+    },
+    {
       "page": "/dinero/[id]",
       "regex": "^/dinero/([^/]+?)(?:/)?$",
       "routeKeys": {
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/dinero/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/ventas/[houseId]",
+      "regex": "^/ventas/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPhouseId": "nxtPhouseId"
+      },
+      "namedRegex": "^/ventas/(?<nxtPhouseId>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [

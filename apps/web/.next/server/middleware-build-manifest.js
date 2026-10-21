@@ -7,9 +7,9 @@ globalThis.__BUILD_MANIFEST = {
     "static/chunks/0cz1d0mv5g_q7.js"
   ],
   "lowPriorityFiles": [
-    "static/Qo1l-c-3fLbMWfT7QlXdM/_buildManifest.js",
-    "static/Qo1l-c-3fLbMWfT7QlXdM/_ssgManifest.js",
-    "static/Qo1l-c-3fLbMWfT7QlXdM/_clientMiddlewareManifest.js"
+    "static/BgotXQwhx4gnUvAbBJ68q/_buildManifest.js",
+    "static/BgotXQwhx4gnUvAbBJ68q/_ssgManifest.js",
+    "static/BgotXQwhx4gnUvAbBJ68q/_clientMiddlewareManifest.js"
   ],
   "rootMainFiles": [
     "static/chunks/35so7tucasst8.js",
@@ -82,6 +82,18 @@ globalThis.__BUILD_MANIFEST = {
       ]
     },
     "/(app)/casas/[id]/actividad/page": {
+      "otherChunks": [
+        "static/chunks/35so7tucasst8.js",
+        "static/chunks/1s9s_tg_lavqf.js",
+        "static/chunks/18nj3qbs10x8r.js",
+        "static/chunks/1muxop3obv6j0.js",
+        "static/chunks/1m-e6xkzf0nfp.js"
+      ],
+      "runtimeModuleIds": [
+        91738
+      ]
+    },
+    "/(app)/casas/[id]/liquidacion/page": {
       "otherChunks": [
         "static/chunks/35so7tucasst8.js",
         "static/chunks/1s9s_tg_lavqf.js",
@@ -166,6 +178,18 @@ globalThis.__BUILD_MANIFEST = {
       ]
     },
     "/(app)/ventas/page": {
+      "otherChunks": [
+        "static/chunks/35so7tucasst8.js",
+        "static/chunks/1s9s_tg_lavqf.js",
+        "static/chunks/18nj3qbs10x8r.js",
+        "static/chunks/1muxop3obv6j0.js",
+        "static/chunks/1m-e6xkzf0nfp.js"
+      ],
+      "runtimeModuleIds": [
+        91738
+      ]
+    },
+    "/(app)/ventas/[houseId]/page": {
       "otherChunks": [
         "static/chunks/35so7tucasst8.js",
         "static/chunks/1s9s_tg_lavqf.js",

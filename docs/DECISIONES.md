@@ -4,6 +4,9 @@ Cada decisión con fecha, qué se decidió y por qué. Las más recientes arriba
 
 | Fecha | Decisión | Razón |
 | --- | --- | --- |
+| 2026-10-21 | La liquidación final se genera cuando ya hay plata recibida y los socios están a paz y salvo (los traslados entre socios se registran antes). Si después se mueve plata, deja de valer y se genera otra versión | Una casa liquidada no recibe más movimientos, así que los traslados deben quedar antes del cierre |
+| 2026-10-21 | Cada socio aprueba con su PIN, verificado dentro de la base de datos; un PIN equivocado cuenta para el bloqueo. Al aprobar el último, la base marca la casa como liquidada; nadie puede marcarla a mano ni reabrirla | La regla no depende de la app ni de un agente |
+| 2026-10-21 | Registrar la venta pasa la casa a "Vendida"; cada abono dice de dónde vino (comprador, crédito, subsidio, cesantías) y a qué socio le llegó; una devolución al comprador es un abono negativo | Así sale "lo que nos debemos" sin pasos extra |
 | 2026-10-21 | Lista fija de 12 categorías de gasto; cada una define si el gasto es de lote, obra o venta, así quien registra no tiene que elegir el tipo | Un campo menos para el papá y la liquidación no depende de que alguien acierte el tipo |
 | 2026-10-21 | La foto del soporte se comprime en el celular (lado mayor 1.600 px, JPEG) y viaja con el formulario; el servidor revisa por contenido que sea foto o PDF, calcula su huella sha256 y la guarda en almacenamiento privado. Límite 4 MB | Vercel no recibe más de 4,5 MB por petición; revisar antes de guardar es más seguro que dejar que el celular suba directo |
 | 2026-10-21 | "Registrar el correcto" anula el gasto equivocado en la misma operación y lo enlaza; cada gasto se corrige una sola vez | Nunca quedan contados los dos, ni ninguno |

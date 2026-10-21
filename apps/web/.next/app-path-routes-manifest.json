@@ -1,5 +1,6 @@
 {
   "/(app)/casas/[id]/actividad/page": "/casas/[id]/actividad",
+  "/(app)/casas/[id]/liquidacion/page": "/casas/[id]/liquidacion",
   "/(app)/casas/[id]/page": "/casas/[id]",
   "/(app)/casas/nueva/page": "/casas/nueva",
   "/(app)/casas/page": "/casas",
@@ -9,6 +10,7 @@
   "/(app)/mas/ajustes/page": "/mas/ajustes",
   "/(app)/mas/page": "/mas",
   "/(app)/page": "/",
+  "/(app)/ventas/[houseId]/page": "/ventas/[houseId]",
   "/(app)/ventas/page": "/ventas",
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",

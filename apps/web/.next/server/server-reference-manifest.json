@@ -24,6 +24,46 @@
       "filename": "apps/web/src/app/(app)/casas/actions.ts",
       "exportedName": "createHouse"
     },
+    "6021d9a6702b5f450b0438b77de6bdc69994b7ec29": {
+      "workers": {
+        "app/(app)/casas/[id]/liquidacion/page": {
+          "moduleId": 90591,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/casas/[id]/liquidacion/actions.ts",
+      "exportedName": "approveSettlement"
+    },
+    "60fe5d111ca2aeaa9406626f125ce310482f9f6bdb": {
+      "workers": {
+        "app/(app)/casas/[id]/liquidacion/page": {
+          "moduleId": 90591,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/casas/[id]/liquidacion/actions.ts",
+      "exportedName": "createSettlement"
+    },
+    "60202c639c1df8f5d352b3eb4b35aad273582cbdba": {
+      "workers": {
+        "app/(app)/casas/[id]/liquidacion/page": {
+          "moduleId": 90591,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/casas/[id]/liquidacion/actions.ts",
+      "exportedName": "createTransfer"
+    },
+    "606de742a460938e95c4cd290345c3d0b58e199022": {
+      "workers": {
+        "app/(app)/casas/[id]/liquidacion/page": {
+          "moduleId": 90591,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/casas/[id]/liquidacion/actions.ts",
+      "exportedName": "voidTransfer"
+    },
     "603bef1667e3234742546db0b4094d73a36bca4c97": {
       "workers": {
         "app/(app)/dinero/[id]/page": {
@@ -125,6 +165,36 @@
       },
       "filename": "apps/web/src/app/(app)/mas/ajustes/actions.ts",
       "exportedName": "addPartner"
+    },
+    "603fa4f918a2ad981112522c4bcac6a87a0fe7a899": {
+      "workers": {
+        "app/(app)/ventas/[houseId]/page": {
+          "moduleId": 30357,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/ventas/actions.ts",
+      "exportedName": "createPayment"
+    },
+    "60a948e4712415bbb6831cb2e4f767f82d1d9d7b58": {
+      "workers": {
+        "app/(app)/ventas/[houseId]/page": {
+          "moduleId": 30357,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/ventas/actions.ts",
+      "exportedName": "createSale"
+    },
+    "60b8f00db5b1d3d3f8e697b1fb1e3d4e8f8f517d1d": {
+      "workers": {
+        "app/(app)/ventas/[houseId]/page": {
+          "moduleId": 30357,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/ventas/actions.ts",
+      "exportedName": "voidPayment"
     },
     "60cd8287f66ecff27eb22b26986abc227fc8f7b194": {
       "workers": {

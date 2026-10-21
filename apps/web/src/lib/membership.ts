@@ -20,3 +20,10 @@ export async function requireMembership() {
   if (!data || !organization) return { supabase, user, membership: null };
   return { supabase, user, membership: { role: data.role as Role, organization } };
 }
+
+/** The membership of someone who may register money (admin or the operating partner), or null. */
+export async function requireWriter() {
+  const ctx = await requireMembership();
+  if (ctx.membership?.role !== "admin" && ctx.membership?.role !== "partner") return null;
+  return { ...ctx, membership: ctx.membership };
+}

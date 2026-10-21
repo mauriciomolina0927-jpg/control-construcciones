@@ -4,17 +4,12 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { bogotaToday, kindOf, LAST_PAYER_COOKIE } from "@/lib/expenses";
-import { requireMembership } from "@/lib/membership";
+import { housePartnerIds } from "@/lib/houses";
+import { requireWriter } from "@/lib/membership";
 import { parsePesos } from "@/lib/money";
 import { checkReceipt, storeReceipt } from "@/lib/receipts";
 
 export type ExpenseFormState = { error?: string };
-
-async function requireWriter() {
-  const ctx = await requireMembership();
-  if (ctx.membership?.role !== "admin" && ctx.membership?.role !== "partner") return null;
-  return { ...ctx, membership: ctx.membership };
-}
 
 export async function createExpense(_: ExpenseFormState, form: FormData): Promise<ExpenseFormState> {
   const amount = parsePesos(String(form.get("amount") ?? ""));
@@ -41,15 +36,7 @@ export async function createExpense(_: ExpenseFormState, form: FormData): Promis
   const { supabase, membership } = ctx;
 
   // Whoever paid must be a partner of this house, or the settlement would not know whom to pay back.
-  const { data: agreement } = await supabase
-    .from("house_agreements")
-    .select("house_agreement_partners (partner_id)")
-    .eq("house_id", houseId)
-    .order("version", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  const partnerIds = (agreement?.house_agreement_partners ?? []).map((p: { partner_id: string }) => p.partner_id);
-  if (!partnerIds.includes(paidBy)) return { error: "Quien pagó debe ser socio de esa casa." };
+  if (!(await housePartnerIds(supabase, houseId)).includes(paidBy)) return { error: "Quien pagó debe ser socio de esa casa." };
 
   const { data: expense, error } = await supabase
     .from("expenses")

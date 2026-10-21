@@ -1,5 +1,6 @@
 {
   "/(app)/casas/[id]/actividad/page": "app/(app)/casas/[id]/actividad/page.js",
+  "/(app)/casas/[id]/liquidacion/page": "app/(app)/casas/[id]/liquidacion/page.js",
   "/(app)/casas/[id]/page": "app/(app)/casas/[id]/page.js",
   "/(app)/casas/nueva/page": "app/(app)/casas/nueva/page.js",
   "/(app)/casas/page": "app/(app)/casas/page.js",
@@ -9,6 +10,7 @@
   "/(app)/mas/ajustes/page": "app/(app)/mas/ajustes/page.js",
   "/(app)/mas/page": "app/(app)/mas/page.js",
   "/(app)/page": "app/(app)/page.js",
+  "/(app)/ventas/[houseId]/page": "app/(app)/ventas/[houseId]/page.js",
   "/(app)/ventas/page": "app/(app)/ventas/page.js",
   "/_global-error/page": "app/_global-error/page.js",
   "/_not-found/page": "app/_not-found/page.js",

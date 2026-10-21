@@ -1,11 +1,26 @@
 [
   {
-    "route": "/gastos/nuevo",
-    "firstLoadUncompressedJsBytes": 472242,
+    "route": "/ventas/[houseId]",
+    "firstLoadUncompressedJsBytes": 472271,
     "firstLoadChunkPaths": [
       ".next/static/chunks/109ty_91-qqwo.js",
       ".next/static/chunks/0kux4iucpgkvr.js",
-      ".next/static/chunks/0ku_d0oe8biwb.js",
+      ".next/static/chunks/18jcv444_731e.js",
+      ".next/static/chunks/35so7tucasst8.js",
+      ".next/static/chunks/1s9s_tg_lavqf.js",
+      ".next/static/chunks/18nj3qbs10x8r.js",
+      ".next/static/chunks/1muxop3obv6j0.js",
+      ".next/static/chunks/1m-e6xkzf0nfp.js",
+      ".next/static/chunks/turbopack-3-ry682tkyiqk.js"
+    ]
+  },
+  {
+    "route": "/gastos/nuevo",
+    "firstLoadUncompressedJsBytes": 472085,
+    "firstLoadChunkPaths": [
+      ".next/static/chunks/109ty_91-qqwo.js",
+      ".next/static/chunks/0kux4iucpgkvr.js",
+      ".next/static/chunks/09oipf3v0_unh.js",
       ".next/static/chunks/35so7tucasst8.js",
       ".next/static/chunks/1s9s_tg_lavqf.js",
       ".next/static/chunks/18nj3qbs10x8r.js",
@@ -21,6 +36,21 @@
       ".next/static/chunks/109ty_91-qqwo.js",
       ".next/static/chunks/0kux4iucpgkvr.js",
       ".next/static/chunks/0y039d0-gippl.js",
+      ".next/static/chunks/35so7tucasst8.js",
+      ".next/static/chunks/1s9s_tg_lavqf.js",
+      ".next/static/chunks/18nj3qbs10x8r.js",
+      ".next/static/chunks/1muxop3obv6j0.js",
+      ".next/static/chunks/1m-e6xkzf0nfp.js",
+      ".next/static/chunks/turbopack-3-ry682tkyiqk.js"
+    ]
+  },
+  {
+    "route": "/casas/[id]/liquidacion",
+    "firstLoadUncompressedJsBytes": 470018,
+    "firstLoadChunkPaths": [
+      ".next/static/chunks/109ty_91-qqwo.js",
+      ".next/static/chunks/0kux4iucpgkvr.js",
+      ".next/static/chunks/3lu7c0qgm33n-.js",
       ".next/static/chunks/35so7tucasst8.js",
       ".next/static/chunks/1s9s_tg_lavqf.js",
       ".next/static/chunks/18nj3qbs10x8r.js",
