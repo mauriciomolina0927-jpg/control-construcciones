@@ -33,3 +33,18 @@ export function BottomNav() {
     </nav>
   );
 }
+
+/** The "+" that papá uses most: register an expense from any screen. */
+export function AddExpenseButton() {
+  const path = usePathname();
+  if (path.startsWith("/gastos")) return null;
+  return (
+    <Link
+      href="/gastos/nuevo"
+      aria-label="Registrar gasto"
+      className="fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] flex size-14 items-center justify-center rounded-full bg-brand text-3xl text-white shadow-lg"
+    >
+      +
+    </Link>
+  );
+}

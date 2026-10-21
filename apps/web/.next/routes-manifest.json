@@ -37,6 +37,14 @@
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/casas/(?<nxtPid>[^/]+?)/actividad(?:/)?$"
+    },
+    {
+      "page": "/dinero/[id]",
+      "regex": "^/dinero/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dinero/(?<nxtPid>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
@@ -93,6 +101,12 @@
       "regex": "^/favicon\\.ico(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/gastos/nuevo",
+      "regex": "^/gastos/nuevo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/gastos/nuevo(?:/)?$"
     },
     {
       "page": "/mas",

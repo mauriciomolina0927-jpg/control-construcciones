@@ -24,6 +24,36 @@
       "filename": "apps/web/src/app/(app)/casas/actions.ts",
       "exportedName": "createHouse"
     },
+    "603bef1667e3234742546db0b4094d73a36bca4c97": {
+      "workers": {
+        "app/(app)/dinero/[id]/page": {
+          "moduleId": 66826,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/gastos/actions.ts",
+      "exportedName": "addReceipt"
+    },
+    "60c9d4d6bf42bef1bd777c67077dfe6c755f49f77c": {
+      "workers": {
+        "app/(app)/dinero/[id]/page": {
+          "moduleId": 66826,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/gastos/actions.ts",
+      "exportedName": "voidExpense"
+    },
+    "605a3d4a1c189238180e7d72de9047ed3176ce6312": {
+      "workers": {
+        "app/(app)/gastos/nuevo/page": {
+          "moduleId": 31455,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/gastos/actions.ts",
+      "exportedName": "createExpense"
+    },
     "0091841b94d395f88b2c62f838faab76bc8b68c8dc": {
       "workers": {
         "app/(app)/mas/page": {

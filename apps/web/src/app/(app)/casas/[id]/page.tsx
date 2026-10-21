@@ -134,14 +134,20 @@ export default async function HousePage({ params }: PageProps<"/casas/[id]">) {
       <Card className="space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Últimos gastos</h2>
-          <Link href={`/casas/${house.id}/actividad`} className="text-sm text-brand">
-            Ver actividad
-          </Link>
+          <span className="flex gap-3 text-sm">
+            <Link href={`/dinero?casa=${house.id}`} className="text-brand">
+              Ver todos
+            </Link>
+            <Link href={`/casas/${house.id}/actividad`} className="text-brand">
+              Actividad
+            </Link>
+          </span>
         </div>
         {(recent ?? []).length === 0 && <p className="text-sm text-foreground/70">Todavía no hay gastos.</p>}
         <ul className="divide-y divide-black/5 text-sm dark:divide-white/10">
           {(recent ?? []).map((e) => (
-            <li key={e.id} className={`flex justify-between gap-2 py-2 ${e.status === "voided" ? "line-through opacity-50" : ""}`}>
+            <li key={e.id}>
+              <Link href={`/dinero/${e.id}`} className={`flex justify-between gap-2 py-2 ${e.status === "voided" ? "line-through opacity-50" : ""}`}>
               <span>
                 {e.category}
                 {e.supplier_name ? ` · ${e.supplier_name}` : ""}
@@ -151,6 +157,7 @@ export default async function HousePage({ params }: PageProps<"/casas/[id]">) {
                 </span>
               </span>
               <span className="font-medium">{formatPesos(toPesos(e.amount))}</span>
+              </Link>
             </li>
           ))}
         </ul>

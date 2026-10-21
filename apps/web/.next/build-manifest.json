@@ -7,9 +7,9 @@
     "static/chunks/0cz1d0mv5g_q7.js"
   ],
   "lowPriorityFiles": [
-    "static/alGrA6cgD0m7PjQcLjEkq/_buildManifest.js",
-    "static/alGrA6cgD0m7PjQcLjEkq/_ssgManifest.js",
-    "static/alGrA6cgD0m7PjQcLjEkq/_clientMiddlewareManifest.js"
+    "static/Qo1l-c-3fLbMWfT7QlXdM/_buildManifest.js",
+    "static/Qo1l-c-3fLbMWfT7QlXdM/_ssgManifest.js",
+    "static/Qo1l-c-3fLbMWfT7QlXdM/_clientMiddlewareManifest.js"
   ],
   "rootMainFiles": [
     "static/chunks/35so7tucasst8.js",
@@ -106,6 +106,30 @@
       ]
     },
     "/(app)/dinero/page": {
+      "otherChunks": [
+        "static/chunks/35so7tucasst8.js",
+        "static/chunks/1s9s_tg_lavqf.js",
+        "static/chunks/18nj3qbs10x8r.js",
+        "static/chunks/1muxop3obv6j0.js",
+        "static/chunks/1m-e6xkzf0nfp.js"
+      ],
+      "runtimeModuleIds": [
+        91738
+      ]
+    },
+    "/(app)/dinero/[id]/page": {
+      "otherChunks": [
+        "static/chunks/35so7tucasst8.js",
+        "static/chunks/1s9s_tg_lavqf.js",
+        "static/chunks/18nj3qbs10x8r.js",
+        "static/chunks/1muxop3obv6j0.js",
+        "static/chunks/1m-e6xkzf0nfp.js"
+      ],
+      "runtimeModuleIds": [
+        91738
+      ]
+    },
+    "/(app)/gastos/nuevo/page": {
       "otherChunks": [
         "static/chunks/35so7tucasst8.js",
         "static/chunks/1s9s_tg_lavqf.js",

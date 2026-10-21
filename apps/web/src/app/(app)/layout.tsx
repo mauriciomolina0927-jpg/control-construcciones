@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui";
 import { requireMembership } from "@/lib/membership";
-import { BottomNav } from "./nav";
+import { AddExpenseButton, BottomNav } from "./nav";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { membership } = await requireMembership();
@@ -22,6 +22,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           </Card>
         )}
       </main>
+      {(membership?.role === "admin" || membership?.role === "partner") && <AddExpenseButton />}
       <BottomNav />
     </div>
   );

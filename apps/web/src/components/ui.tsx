@@ -36,3 +36,17 @@ export function Message({ tone = "error", children }: { tone?: "error" | "info";
     </p>
   );
 }
+
+export const selectClass =
+  "w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-base dark:border-white/20 dark:bg-white/10";
+
+export function Select({ label, children, ...props }: ComponentProps<"select"> & { label: string }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-sm font-medium">{label}</span>
+      <select className={selectClass} {...props}>
+        {children}
+      </select>
+    </label>
+  );
+}
