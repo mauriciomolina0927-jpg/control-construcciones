@@ -10,11 +10,11 @@ export default async function NewHousePage() {
   const { data: partners } = await supabase.from("partners").select("id, name").order("created_at");
 
   return (
-    <>
-      <h1 className="text-xl font-bold">Nueva casa</h1>
+    <div className="mx-auto w-full max-w-2xl space-y-4">
+      <h1 className="text-[28px] font-normal tracking-[-0.03em]">Nueva casa</h1>
       <Card>
         <HouseForm partners={partners ?? []} />
       </Card>
-    </>
+    </div>
   );
 }

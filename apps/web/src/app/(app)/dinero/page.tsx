@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Card } from "@/components/ui";
+import { HouseHeader } from "@/components/house-header";
+import { Card, PageTitle } from "@/components/ui";
 import { requireMembership } from "@/lib/membership";
 import { formatPesos, toPesos } from "@/lib/money";
+import type { Stage } from "@/lib/stages";
 
 const FILTERS = [
   { key: "todos", label: "Todos" },
@@ -26,9 +28,10 @@ export default async function MoneyPage({ searchParams }: PageProps<"/dinero">) 
 
   const [{ data: expenses }, { data: houses }] = await Promise.all([
     query,
-    supabase.from("houses").select("id, name").order("created_at"),
+    supabase.from("houses").select("id, name, stage, address").order("created_at"),
   ]);
 
+  const house = (houses ?? []).find((h) => h.id === casa);
   type Row = NonNullable<typeof expenses>[number] & { house: { name: string } | null; paid_by: { name: string } | null };
   const rows = (expenses ?? []) as unknown as Row[];
   const total = rows.reduce((sum, e) => sum + toPesos(e.amount), 0n);
@@ -40,9 +43,13 @@ export default async function MoneyPage({ searchParams }: PageProps<"/dinero">) 
 
   return (
     <>
-      <h1 className="text-xl font-bold">Dinero</h1>
+      {house ? (
+        <HouseHeader house={{ ...house, stage: house.stage as Stage }} active="gastos" />
+      ) : (
+        <PageTitle title="Dinero" subtitle="Todos los gastos registrados, con su soporte." />
+      )}
 
-      <nav className="flex flex-wrap gap-2 text-sm">
+      <nav className={`flex flex-wrap gap-2 text-sm ${house ? "hidden" : ""}`}>
         <Link href={link({ casa: undefined })} className={chip(!casa)}>
           Todas las casas
         </Link>
@@ -62,11 +69,11 @@ export default async function MoneyPage({ searchParams }: PageProps<"/dinero">) 
 
       <Card className="space-y-2">
         <div className="flex items-baseline justify-between">
-          <h2 className="font-semibold">{rows.length === 1 ? "1 gasto" : `${rows.length} gastos`}</h2>
-          {ver !== "anulados" && <span className="text-lg font-semibold">{formatPesos(total)}</span>}
+          <h2 className="font-medium">{rows.length === 1 ? "1 gasto" : `${rows.length} gastos`}</h2>
+          {ver !== "anulados" && <span className="text-lg font-medium">{formatPesos(total)}</span>}
         </div>
         {rows.length === 0 && <p className="text-sm text-foreground/70">No hay gastos con este filtro.</p>}
-        <ul className="divide-y divide-black/5 text-sm dark:divide-white/10">
+        <ul className="divide-y divide-line text-sm">
           {rows.map((e) => (
             <li key={e.id}>
               <Link href={`/dinero/${e.id}`} className={`flex justify-between gap-2 py-2 ${e.status === "voided" ? "opacity-60" : ""}`}>
@@ -76,7 +83,7 @@ export default async function MoneyPage({ searchParams }: PageProps<"/dinero">) 
                   <span className="block text-xs text-foreground/60">
                     {e.spent_on} · {e.house?.name} · pagó {e.paid_by?.name}
                     {e.status === "active" && !e.has_receipt && (
-                      <span className="text-amber-700 dark:text-amber-400"> · sin soporte</span>
+                      <span className="text-red-600"> · sin soporte</span>
                     )}
                   </span>
                 </span>
@@ -93,5 +100,5 @@ export default async function MoneyPage({ searchParams }: PageProps<"/dinero">) 
 }
 
 function chip(active: boolean) {
-  return `rounded-full px-3 py-1 ${active ? "bg-brand text-white" : "bg-black/5 dark:bg-white/10"}`;
+  return `rounded-full px-3.5 py-1.5 ${active ? "bg-foreground text-white" : "border border-line bg-white text-foreground/70"}`;
 }

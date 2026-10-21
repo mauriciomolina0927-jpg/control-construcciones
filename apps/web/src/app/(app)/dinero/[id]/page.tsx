@@ -42,12 +42,12 @@ export default async function ExpensePage({ params, searchParams }: PageProps<"/
   const notice = typeof aviso === "string" ? NOTICES[aviso] : undefined;
 
   return (
-    <>
+    <div className="mx-auto w-full max-w-2xl space-y-4">
       <header className="space-y-1">
         <Link href="/dinero" className="text-sm text-brand">
           ‹ Dinero
         </Link>
-        <h1 className="text-xl font-bold">{e.category}</h1>
+        <h1 className="text-[28px] font-normal tracking-[-0.03em]">{e.category}</h1>
         {notice && <Message tone={notice.tone}>{notice.text}</Message>}
         {aviso === "guardado" && (
           <Link href="/gastos/nuevo" className="inline-block text-sm font-semibold text-brand">
@@ -126,7 +126,7 @@ export default async function ExpensePage({ params, searchParams }: PageProps<"/
           <VoidForm id={e.id} />
         </Card>
       )}
-    </>
+    </div>
   );
 }
 

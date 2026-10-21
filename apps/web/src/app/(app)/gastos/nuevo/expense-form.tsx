@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { ReceiptInput } from "@/components/receipt-input";
-import { Button, Field, Message, Select } from "@/components/ui";
+import { Button, Field, inputClass, Message, Select } from "@/components/ui";
 import { CATEGORIES, KIND_LABELS } from "@/lib/expenses";
 import { createExpense, type ExpenseFormState } from "../actions";
 
@@ -56,6 +56,7 @@ export function ExpenseForm({
         onChange={(e) => setAmount(groupThousands(e.target.value))}
         required
         autoFocus
+        className={`${inputClass.replace("text-base", "text-3xl")} py-4 tracking-tight`}
       />
       <Field label="Fecha" name="spent_on" type="date" defaultValue={defaults.spentOn} max={today} required />
 
@@ -93,13 +94,13 @@ export function ExpenseForm({
       </Select>
 
       <fieldset>
-        <legend className="mb-1 text-sm font-medium">¿Quién pagó?</legend>
+        <legend className="mb-1.5 text-sm text-foreground/60">¿Quién pagó?</legend>
         {partners.length === 0 && <p className="text-sm text-foreground/70">Primero elige la casa.</p>}
         <div className="flex gap-2">
           {partners.map((p) => (
             <label
               key={p.id}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/15 px-3 py-3 has-checked:border-brand has-checked:bg-brand/10 dark:border-white/20"
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-line bg-white px-3 py-3 has-checked:border-foreground has-checked:bg-foreground has-checked:text-white"
             >
               <input
                 type="radio"

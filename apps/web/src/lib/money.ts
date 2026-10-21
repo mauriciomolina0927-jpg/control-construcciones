@@ -21,3 +21,13 @@ export function parsePesos(text: string): bigint | null {
   if (!/^\d+$/.test(digits)) return null;
   return BigInt(digits);
 }
+
+/** "$ 165,5 M" for a summary figure; amounts under a million keep every peso. Rounds half away from zero. */
+export function formatMillions(amount: bigint): string {
+  const negative = amount < 0n;
+  const abs = negative ? -amount : amount;
+  if (abs < 1_000_000n) return formatPesos(amount);
+  const tenths = (abs + 50_000n) / 100_000n;
+  const whole = (tenths / 10n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${negative ? "−" : ""}$ ${whole},${tenths % 10n} M`;
+}

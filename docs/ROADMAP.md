@@ -10,11 +10,13 @@
 ## Incrementos de la Fase 3
 
 1. Núcleo financiero: casas, aportes, gastos, liquidación provisional y final, bitácora, registro manual.
-2. WhatsApp con agente y bandeja de sugerencias; pantalla Hoy.
-3. Ventas y cartera; estado de cuenta por socio; exportación para el contador.
-4. Modelos y presupuesto; proveedores y precios.
+2. WhatsApp con agente y bandeja de sugerencias; recibo por foto (la app lee el recibo y propone el gasto); pantalla Hoy.
+3. Ventas y cartera; enlace de consulta para el comprador; alertas de lo pendiente por pagar o cobrar; simulador de venta; estado de cuenta por socio; exportación para el contador.
+4. Presupuesto por capítulos; costo real por m² para presupuestar la siguiente casa; proveedores e historial de precios.
 5. Documentos, Biblioteca de diseño, marketing.
-6. Servidor MCP, portal del comprador, varias empresas.
+6. Servidor MCP, varias empresas.
+
+Fuera por ahora: informe mensual automático para el socio (decidido el 2026-10-21).
 
 ## Riesgos principales
 

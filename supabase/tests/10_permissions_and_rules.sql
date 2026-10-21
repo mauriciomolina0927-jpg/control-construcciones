@@ -133,9 +133,11 @@ select test.eq(
   '87500000', 'the admin cannot change a settlement');
 
 select test.login('00000000-0000-0000-0000-0000000000c1');
-insert into public.settlement_approvals (organization_id, settlement_id, partner_id)
-values ('10000000-0000-0000-0000-000000000001', '70000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-0000000000c1');
-select test.eq((select count(*) from public.settlement_approvals), 1::bigint, 'socio approves the settlement for himself');
+-- Approving goes through approve_settlement and its PIN (see 60_settlement_approval.sql).
+select test.throws(
+  $$insert into public.settlement_approvals (organization_id, settlement_id, partner_id)
+    values ('10000000-0000-0000-0000-000000000001', '70000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-0000000000c1')$$,
+  'row-level security', 'socio cannot approve without his PIN');
 select test.throws(
   $$insert into public.settlement_approvals (organization_id, settlement_id, partner_id)
     values ('10000000-0000-0000-0000-000000000001', '70000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-0000000000b1')$$,

@@ -82,3 +82,15 @@ export async function loadHouseFinance(
   const expensesWithoutReceipt = (expenses.data ?? []).filter((e) => e.status === "active" && !e.has_receipt).length;
   return { partners, settlement, projected, expensesWithoutReceipt };
 }
+
+/** Partners of the house's current agreement. Money can only be paid or received by one of them. */
+export async function housePartnerIds(supabase: SupabaseClient, houseId: string): Promise<string[]> {
+  const { data } = await supabase
+    .from("house_agreements")
+    .select("house_agreement_partners (partner_id)")
+    .eq("house_id", houseId)
+    .order("version", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data?.house_agreement_partners ?? []).map((p: { partner_id: string }) => p.partner_id);
+}
