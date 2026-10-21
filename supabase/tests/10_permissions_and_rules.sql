@@ -170,3 +170,15 @@ select test.throws(
 select test.throws(
   $$update public.settlements set breakdown = '{"socio": 1}'$$,
   'cannot be changed', 'the owner cannot change a settlement');
+
+-- The app reads back what it inserts (INSERT ... RETURNING).
+set role authenticated;
+select test.login('00000000-0000-0000-0000-0000000000a1');
+select test.throws(
+  $t$do $do$ declare n text; begin
+      insert into public.houses (organization_id, name) values ('10000000-0000-0000-0000-000000000001', 'Casa nueva')
+      returning name into n;
+      if n = 'Casa nueva' then raise exception 'returned ok'; end if;
+    end $do$$t$,
+  'returned ok', 'the admin gets back the house just created');
+reset role;
