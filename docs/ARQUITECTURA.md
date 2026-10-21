@@ -35,7 +35,7 @@ Montos en pesos enteros; el peso sobrante va al socio con mayor aporte. La liqui
 | `partner` | name, user_id |
 | `house` | name, address, stage (lot, design, construction, for_sale, sold, settled), expected_price |
 | `house_agreement` | house_id, version, profit_split, lot_value, accepted_by, accepted_at |
-| `expense` | house_id (obligatorio), amount, date, kind (lot, construction, sale_cost), category_id, supplier_name, paid_by_partner_id, has_receipt, source, status, replaces_id |
+| `expense` | house_id (obligatorio), amount, date, kind (lot, construction, sale_cost, derivado de la categoría), category (lista fija en `apps/web/src/lib/expenses.ts`), supplier_name, paid_by_partner_id, has_receipt, source, status, replaces_id |
 | `attachment` | owner_type, owner_id, storage_path, mime_type, size, sha256 |
 | `sale` | house_id, buyer_name, agreed_price, status |
 | `sale_payment` | sale_id, amount (negativo = devolución), date, source, received_by_partner_id, status |
