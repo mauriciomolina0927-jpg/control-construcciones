@@ -58,7 +58,7 @@ create trigger settlements_open_house before insert on public.settlements
   for each row execute function public.guard_new_settlement();
 
 -- Approvals go only through approve_settlement, which checks the PIN.
-drop policy settlement_approvals_insert on public.settlement_approvals;
+alter policy settlement_approvals_insert on public.settlement_approvals with check (false);
 
 -- Returns 'approved', 'settled' (the last approval closed the house), or the PIN result
 -- ('wrong', 'locked', 'no_pin'). A wrong PIN returns instead of raising, so the failed attempt counts.
