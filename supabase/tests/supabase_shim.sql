@@ -8,8 +8,12 @@ create role service_role nologin bypassrls;
 create schema auth;
 create table auth.users (
   id uuid primary key default gen_random_uuid(),
-  email text unique
+  email text unique,
+  last_sign_in_at timestamptz default now()
 );
+
+create schema extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
 
 create function auth.uid() returns uuid
 language sql stable
