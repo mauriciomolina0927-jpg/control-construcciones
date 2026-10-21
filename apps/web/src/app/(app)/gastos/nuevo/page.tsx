@@ -2,8 +2,9 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { Card } from "@/components/ui";
 import { bogotaToday, LAST_PAYER_COOKIE } from "@/lib/expenses";
+import { openHouseOptions } from "@/lib/houses";
 import { requireMembership } from "@/lib/membership";
-import { ExpenseForm, type ExpenseDefaults, type HouseOption } from "./expense-form";
+import { ExpenseForm, type ExpenseDefaults } from "./expense-form";
 
 export default async function NewExpensePage({ searchParams }: PageProps<"/gastos/nuevo">) {
   const { reemplaza } = await searchParams;
@@ -16,12 +17,8 @@ export default async function NewExpensePage({ searchParams }: PageProps<"/gasto
     );
   }
 
-  const [{ data: houses }, { data: me }, { data: old }] = await Promise.all([
-    supabase
-      .from("houses")
-      .select("id, name, house_agreements (version, house_agreement_partners (partner:partners (id, name)))")
-      .neq("stage", "settled")
-      .order("created_at"),
+  const [options, { data: me }, { data: old }] = await Promise.all([
+    openHouseOptions(supabase),
     supabase.from("partners").select("id").eq("user_id", user.id).maybeSingle(),
     typeof reemplaza === "string"
       ? supabase
@@ -31,12 +28,6 @@ export default async function NewExpensePage({ searchParams }: PageProps<"/gasto
           .maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
-
-  type Agreement = { version: number; house_agreement_partners: { partner: { id: string; name: string } }[] };
-  const options: HouseOption[] = (houses ?? []).map((h) => {
-    const latest = (h.house_agreements as unknown as Agreement[]).toSorted((a, b) => b.version - a.version)[0];
-    return { id: h.id, name: h.name, partners: (latest?.house_agreement_partners ?? []).map((p) => p.partner) };
-  });
 
   const today = bogotaToday();
   const defaults: ExpenseDefaults = old

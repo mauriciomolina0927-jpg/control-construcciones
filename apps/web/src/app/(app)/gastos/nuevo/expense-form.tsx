@@ -4,9 +4,9 @@ import { useActionState, useState } from "react";
 import { ReceiptInput } from "@/components/receipt-input";
 import { Button, Field, inputClass, Message, Select } from "@/components/ui";
 import { CATEGORIES, KIND_LABELS } from "@/lib/expenses";
+import type { HouseOption } from "@/lib/houses";
 import { createExpense, type ExpenseFormState } from "../actions";
 
-export type HouseOption = { id: string; name: string; partners: { id: string; name: string }[] };
 export type ExpenseDefaults = {
   amount?: string;
   spentOn: string;
@@ -16,6 +16,10 @@ export type ExpenseDefaults = {
   supplier?: string;
   description?: string;
   replacesId?: string;
+  /** Confirming a suggestion that came by WhatsApp. */
+  suggestionId?: string;
+  /** The suggestion brought a photo, which is kept unless another one is chosen. */
+  hasWhatsappPhoto?: boolean;
 };
 
 
@@ -47,6 +51,7 @@ export function ExpenseForm({
   return (
     <form action={action} className="space-y-4">
       {defaults.replacesId && <input type="hidden" name="replaces_id" value={defaults.replacesId} />}
+      {defaults.suggestionId && <input type="hidden" name="suggestion_id" value={defaults.suggestionId} />}
       <Field
         label="Valor"
         name="amount"
@@ -55,7 +60,7 @@ export function ExpenseForm({
         value={amount}
         onChange={(e) => setAmount(groupThousands(e.target.value))}
         required
-        autoFocus
+        autoFocus={!defaults.suggestionId}
         className={`${inputClass.replace("text-base", "text-3xl")} py-4 tracking-tight`}
       />
       <Field label="Fecha" name="spent_on" type="date" defaultValue={defaults.spentOn} max={today} required />
@@ -119,10 +124,16 @@ export function ExpenseForm({
 
       <Field label="Proveedor (opcional)" name="supplier" defaultValue={defaults.supplier} placeholder="Ferretería El Maestro" />
       <Field label="Nota (opcional)" name="description" defaultValue={defaults.description} />
-      <ReceiptInput onBusyChange={setBusy} />
+      {defaults.hasWhatsappPhoto ? (
+        <p className="text-sm text-foreground/60">Se guarda con la foto que llegó por WhatsApp.</p>
+      ) : (
+        <ReceiptInput onBusyChange={setBusy} />
+      )}
 
       <Message>{state.error}</Message>
-      <Button disabled={pending || busy}>{pending ? "Guardando…" : busy ? "Preparando foto…" : "Guardar gasto"}</Button>
+      <Button disabled={pending || busy}>
+        {pending ? "Guardando…" : busy ? "Preparando foto…" : defaults.suggestionId ? "Confirmar gasto" : "Guardar gasto"}
+      </Button>
     </form>
   );
 }

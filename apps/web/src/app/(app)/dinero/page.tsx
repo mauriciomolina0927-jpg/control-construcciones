@@ -26,9 +26,10 @@ export default async function MoneyPage({ searchParams }: PageProps<"/dinero">) 
   else if (ver === "anulados") query = query.eq("status", "voided");
   else query = query.eq("status", "active");
 
-  const [{ data: expenses }, { data: houses }] = await Promise.all([
+  const [{ data: expenses }, { data: houses }, { count: pending }] = await Promise.all([
     query,
     supabase.from("houses").select("id, name, stage, address").order("created_at"),
+    supabase.from("expense_suggestions").select("id", { count: "exact", head: true }).eq("status", "pending"),
   ]);
 
   const house = (houses ?? []).find((h) => h.id === casa);
@@ -59,7 +60,12 @@ export default async function MoneyPage({ searchParams }: PageProps<"/dinero">) 
           </Link>
         ))}
       </nav>
-      <nav className="flex gap-2 text-sm">
+      <nav className="flex flex-wrap gap-2 text-sm">
+        {!!pending && (
+          <Link href="/dinero/revisar" className="rounded-full bg-accent px-3.5 py-1.5 font-medium text-white">
+            Por revisar · {pending}
+          </Link>
+        )}
         {FILTERS.map((f) => (
           <Link key={f.key} href={link({ ver: f.key })} className={chip(ver === f.key)}>
             {f.label}

@@ -15,7 +15,7 @@ export default async function HomePage() {
   const months = spentByMonth([], today);
 
   // Explicit foreign keys: sale_payments links houses and sales, so "sales" alone would be ambiguous.
-  const [{ data: houses }, { data: expenses }, { data: me }] = await Promise.all([
+  const [{ data: houses }, { data: expenses }, { data: me }, { count: toReview }] = await Promise.all([
     supabase
       .from("houses")
       .select(
@@ -31,6 +31,7 @@ export default async function HomePage() {
       .order("spent_on", { ascending: false })
       .order("created_at", { ascending: false }),
     supabase.from("partners").select("name").eq("user_id", user.id).maybeSingle(),
+    supabase.from("expense_suggestions").select("id", { count: "exact", head: true }).eq("status", "pending"),
   ]);
 
   type HouseRow = {
@@ -73,12 +74,23 @@ export default async function HomePage() {
   const withoutReceipt = rows.reduce((sum, r) => sum + r.finance.expensesWithoutReceipt, 0);
   const toCollect = rows.reduce((sum, r) => sum + (r.toCollect > 0n ? r.toCollect : 0n), 0n);
 
-  const attention = rows.flatMap((r) => {
+  type Attention = { key: string; tone: "red" | "accent"; title: string; detail: string; href: string; action: string };
+  const attention: Attention[] = [];
+  if (toReview) {
+    attention.push({
+      key: "whatsapp",
+      tone: "accent",
+      title: toReview === 1 ? "1 gasto de WhatsApp por revisar" : `${toReview} gastos de WhatsApp por revisar`,
+      detail: "No cuentan hasta que los confirmes",
+      href: "/dinero/revisar",
+      action: "Revisar",
+    });
+  }
+  for (const r of rows) {
     const name = new Map(r.finance.partners.map((p) => [p.id, p.name]));
-    const items: { key: string; tone: "red" | "accent"; title: string; detail: string; href: string; action: string }[] = [];
     if (r.finance.expensesWithoutReceipt > 0) {
       const n = r.finance.expensesWithoutReceipt;
-      items.push({
+      attention.push({
         key: `${r.id}-receipts`,
         tone: "red",
         title: n === 1 ? "1 gasto sin soporte" : `${n} gastos sin soporte`,
@@ -88,7 +100,7 @@ export default async function HomePage() {
       });
     }
     for (const p of r.finance.settlement.partners.filter((p) => p.balance > 0n)) {
-      items.push({
+      attention.push({
         key: `${r.id}-${p.partnerId}`,
         tone: "accent",
         title: `A ${name.get(p.partnerId)} le deben ${formatMillions(p.balance)}`,
@@ -97,8 +109,7 @@ export default async function HomePage() {
         action: "Ver reparto",
       });
     }
-    return items;
-  });
+  }
 
   const firstName = me?.name.split(" ")[0];
   const date = LONG_DATE.format(new Date());
