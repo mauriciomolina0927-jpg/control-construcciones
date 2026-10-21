@@ -2,6 +2,8 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { createClient as createLinkClient } from "@supabase/supabase-js";
+import { supabaseKey, supabaseUrl } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
 export type SignInState = { step: "email" | "code"; email: string; error?: string; info?: string };
@@ -18,9 +20,14 @@ export async function sendCode(_: SignInState, form: FormData): Promise<SignInSt
   }
 
   const origin = (await headers()).get("origin") ?? "";
-  const { error } = await supabase.auth.signInWithOtp({
+  // The email link uses the implicit flow so it works on any phone or browser, not only the one that asked
+  // for it (the PKCE flow needs a cookie from the browser that sent the request). /auth/confirm takes it from there.
+  const linkClient = createLinkClient(supabaseUrl(), supabaseKey(), {
+    auth: { flowType: "implicit", persistSession: false, autoRefreshToken: false },
+  });
+  const { error } = await linkClient.auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: true, emailRedirectTo: `${origin}/auth/callback` },
+    options: { shouldCreateUser: true, emailRedirectTo: `${origin}/auth/confirm` },
   });
   if (error) return { step: "email", email, error: "No pudimos enviar el correo. Espera un minuto e intenta otra vez." };
 
