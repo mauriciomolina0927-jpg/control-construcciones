@@ -4,6 +4,9 @@ Cada decisión con fecha, qué se decidió y por qué. Las más recientes arriba
 
 | Fecha | Decisión | Razón |
 | --- | --- | --- |
+| 2026-10-21 | Mejoras que entran (después de publicar el incremento 1): recibo por foto (la app lee valor, proveedor y fecha y propone el gasto; una persona confirma), simulador de venta (precio → cuánto le queda a cada socio, con la regla del reparto), costo real por m² y por capítulo para presupuestar la siguiente casa, historial de precios por material y proveedor, y enlace de consulta para el comprador (fotos y estado de sus pagos) | Elegidas por Mauricio; el simulador y el costo por m² usan datos que la app ya guarda |
+| 2026-10-21 | Las alertas son solo de lo pendiente por pagar o cobrar: fiados a proveedores, saldo del maestro en cada corte y cuotas vencidas del comprador. No hay alertas de presupuesto | Pedido de Mauricio |
+| 2026-10-21 | Queda fuera por ahora el informe mensual automático para Jesús | Mauricio no lo necesita todavía |
 | 2026-10-21 | La liquidación final se genera cuando ya hay plata recibida y los socios están a paz y salvo (los traslados entre socios se registran antes). Si después se mueve plata, deja de valer y se genera otra versión | Una casa liquidada no recibe más movimientos, así que los traslados deben quedar antes del cierre |
 | 2026-10-21 | Cada socio aprueba con su PIN, verificado dentro de la base de datos; un PIN equivocado cuenta para el bloqueo. Al aprobar el último, la base marca la casa como liquidada; nadie puede marcarla a mano ni reabrirla | La regla no depende de la app ni de un agente |
 | 2026-10-21 | Registrar la venta pasa la casa a "Vendida"; cada abono dice de dónde vino (comprador, crédito, subsidio, cesantías) y a qué socio le llegó; una devolución al comprador es un abono negativo | Así sale "lo que nos debemos" sin pasos extra |
