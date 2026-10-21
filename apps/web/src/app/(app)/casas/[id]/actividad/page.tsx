@@ -1,6 +1,8 @@
-import Link from "next/link";
+import { notFound } from "next/navigation";
+import { HouseHeader } from "@/components/house-header";
 import { Card } from "@/components/ui";
 import { requireMembership } from "@/lib/membership";
+import type { Stage } from "@/lib/stages";
 
 const TABLE_LABELS: Record<string, string> = {
   houses: "Casa",
@@ -34,7 +36,7 @@ export default async function ActivityPage({ params }: PageProps<"/casas/[id]/ac
   const { supabase } = await requireMembership();
 
   const [{ data: house }, { data: partners }, { data: log }] = await Promise.all([
-    supabase.from("houses").select("name").eq("id", id).maybeSingle(),
+    supabase.from("houses").select("id, name, stage").eq("id", id).maybeSingle(),
     supabase.from("partners").select("name, user_id").not("user_id", "is", null),
     supabase
       .from("audit_log")
@@ -44,20 +46,17 @@ export default async function ActivityPage({ params }: PageProps<"/casas/[id]/ac
       .limit(100),
   ]);
 
+  if (!house) notFound();
   const byUser = new Map((partners ?? []).map((p) => [p.user_id, p.name]));
   const who = (actor: string | null) => (actor ? (byUser.get(actor) ?? "Administrador") : "Sistema");
 
   return (
     <>
-      <header className="space-y-1">
-        <Link href={`/casas/${id}`} className="text-sm text-brand">
-          ‹ {house?.name ?? "Casa"}
-        </Link>
-        <h1 className="text-xl font-bold">Actividad</h1>
-        <p className="text-sm text-foreground/60">Todo cambio queda registrado y no se puede borrar.</p>
-      </header>
+      <HouseHeader house={{ ...house, stage: house.stage as Stage }} active="actividad" />
+      <p className="text-sm text-foreground/60">Todo cambio queda registrado y no se puede borrar.</p>
+      <div className="space-y-4 md:max-w-3xl">
       <Card>
-        <ul className="divide-y divide-black/5 text-sm dark:divide-white/10">
+        <ul className="divide-y divide-line text-sm">
           {(log ?? []).map((row) => (
             <li key={row.id} className="py-2">
               <span className="first-letter:uppercase">{describe(row)}</span>
@@ -69,6 +68,7 @@ export default async function ActivityPage({ params }: PageProps<"/casas/[id]/ac
           {!log?.length && <li className="py-2 text-foreground/70">Sin actividad todavía.</li>}
         </ul>
       </Card>
+      </div>
     </>
   );
 }

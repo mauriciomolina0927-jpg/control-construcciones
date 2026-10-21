@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Card } from "@/components/ui";
+import { StageChip } from "@/components/stage-chip";
+import { Card, PageTitle } from "@/components/ui";
 import { requireMembership } from "@/lib/membership";
 import { formatPesos, toPesos } from "@/lib/money";
-import { STAGE_LABELS, type Stage } from "@/lib/stages";
+import type { Stage } from "@/lib/stages";
 
 export default async function SalesPage() {
   const { supabase } = await requireMembership();
@@ -22,10 +23,11 @@ export default async function SalesPage() {
 
   return (
     <>
-      <h1 className="text-xl font-bold">Ventas</h1>
+      <PageTitle title="Ventas" subtitle="Compradores, precio pactado y abonos de cada casa." />
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-3">
       {(houses ?? []).length === 0 && (
         <Card>
-          <p className="text-sm text-foreground/70">Todavía no hay casas.</p>
+          <p className="text-sm text-foreground/60">Todavía no hay casas.</p>
         </Card>
       )}
       {((houses ?? []) as unknown as Row[]).map((h) => {
@@ -36,28 +38,29 @@ export default async function SalesPage() {
         const missing = sale ? toPesos(sale.agreed_price) - received : 0n;
         return (
           <Link key={h.id} href={`/ventas/${h.id}`} className="block">
-            <Card className="space-y-1">
+            <Card className="h-full space-y-1 transition-colors hover:border-foreground/20">
               <div className="flex items-baseline justify-between">
-                <h2 className="font-semibold">{h.name}</h2>
-                <span className="text-xs text-foreground/60">{STAGE_LABELS[h.stage]}</span>
+                <h2 className="text-lg font-medium tracking-tight">{h.name}</h2>
+                <StageChip stage={h.stage} />
               </div>
               {sale ? (
                 <>
                   <p className="text-sm">
                     {sale.buyer_name} · pactado {formatPesos(toPesos(sale.agreed_price))}
                   </p>
-                  <p className="text-sm text-foreground/70">
+                  <p className="text-sm text-foreground/60">
                     Recibido {formatPesos(received)}
                     {missing > 0n && ` · faltan ${formatPesos(missing)}`}
                   </p>
                 </>
               ) : (
-                <p className="text-sm text-foreground/70">Sin venta registrada</p>
+                <p className="text-sm text-foreground/60">Sin venta registrada</p>
               )}
             </Card>
           </Link>
         );
       })}
+      </div>
     </>
   );
 }

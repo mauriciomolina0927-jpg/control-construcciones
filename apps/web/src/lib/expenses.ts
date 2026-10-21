@@ -31,6 +31,14 @@ export function bogotaToday(now = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(now);
 }
 
+/** "Buenos días", "Buenas tardes" or "Buenas noches" by the hour in Colombia. */
+export function bogotaGreeting(now = new Date()): string {
+  const hour = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/Bogota", hour: "numeric", hourCycle: "h23" }).format(now));
+  if (hour < 12) return "Buenos días";
+  if (hour < 19) return "Buenas tardes";
+  return "Buenas noches";
+}
+
 /** Who paid the last expense, so the next one starts with the same person. */
 export const LAST_PAYER_COOKIE = "cc_last_payer";
 
@@ -49,4 +57,31 @@ export function detectReceiptType(bytes: Uint8Array): ReceiptType | null {
     return { mime: "image/heic", extension: "heic" };
   }
   return null;
+}
+
+const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+/** The last `count` months up to the one of `today` (YYYY-MM-DD), oldest first, with what was spent in each. */
+export function spentByMonth(
+  expenses: { amount: bigint; spentOn: string }[],
+  today: string,
+  count = 6,
+): { key: string; label: string; total: bigint }[] {
+  let year = Number(today.slice(0, 4));
+  let month = Number(today.slice(5, 7));
+  const months: { key: string; label: string; total: bigint }[] = [];
+  for (let i = 0; i < count; i++) {
+    months.unshift({ key: `${year}-${String(month).padStart(2, "0")}`, label: MONTHS[month - 1]!, total: 0n });
+    month -= 1;
+    if (month === 0) {
+      month = 12;
+      year -= 1;
+    }
+  }
+  const byKey = new Map(months.map((m) => [m.key, m]));
+  for (const e of expenses) {
+    const m = byKey.get(e.spentOn.slice(0, 7));
+    if (m) m.total += e.amount;
+  }
+  return months;
 }

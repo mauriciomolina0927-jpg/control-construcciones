@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Card } from "@/components/ui";
+import { StageChip } from "@/components/stage-chip";
+import { Card, LinkButton, PageTitle } from "@/components/ui";
 import { loadHouseFinance } from "@/lib/houses";
 import { requireMembership } from "@/lib/membership";
-import { formatPesos, toPesos } from "@/lib/money";
-import { STAGE_LABELS, type Stage } from "@/lib/stages";
+import { formatMillions, toPesos } from "@/lib/money";
+import type { Stage } from "@/lib/stages";
 
 export default async function HousesPage() {
   const { supabase, membership } = await requireMembership();
@@ -21,46 +22,43 @@ export default async function HousesPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Casas</h1>
-        {membership?.role === "admin" && (
-          <Link href="/casas/nueva" className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white">
-            Nueva casa
-          </Link>
-        )}
-      </div>
+      <PageTitle
+        title="Casas"
+        subtitle={rows.length === 1 ? "1 casa" : `${rows.length} casas`}
+        actions={membership?.role === "admin" && <LinkButton href="/casas/nueva">+ Nueva casa</LinkButton>}
+      />
       {rows.length === 0 && (
         <Card>
-          <p className="text-sm text-foreground/70">Todavía no hay casas registradas.</p>
+          <p className="text-sm text-foreground/60">Todavía no hay casas registradas.</p>
         </Card>
       )}
-      {rows.map((h) => (
-        <Link key={h.id} href={`/casas/${h.id}`} className="block">
-          <Card>
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <h2 className="font-semibold">{h.name}</h2>
-                {h.address && <p className="text-sm text-foreground/60">{h.address}</p>}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {rows.map((h) => (
+          <Link key={h.id} href={`/casas/${h.id}`} className="block">
+            <Card className="h-full space-y-4 transition-colors hover:border-foreground/20">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="text-lg font-medium tracking-tight">{h.name}</h2>
+                  {h.address && <p className="truncate text-sm text-foreground/60">{h.address}</p>}
+                </div>
+                <StageChip stage={h.stage as Stage} />
               </div>
-              <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
-                {STAGE_LABELS[h.stage as Stage]}
-              </span>
-            </div>
-            <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <dt className="text-foreground/60">Capital invertido</dt>
-                <dd className="font-semibold">{formatPesos(h.finance.settlement.totalCapital)}</dd>
-              </div>
-              <div>
-                <dt className="text-foreground/60">Gastos sin soporte</dt>
-                <dd className={`font-semibold ${h.finance.expensesWithoutReceipt ? "text-amber-700 dark:text-amber-400" : ""}`}>
-                  {h.finance.expensesWithoutReceipt}
-                </dd>
-              </div>
-            </dl>
-          </Card>
-        </Link>
-      ))}
+              <dl className="grid grid-cols-2 gap-3">
+                <div>
+                  <dt className="text-[13px] text-foreground/60">Invertido</dt>
+                  <dd className="mt-0.5 text-xl font-medium tracking-tight">{formatMillions(h.finance.settlement.totalCapital)}</dd>
+                </div>
+                <div>
+                  <dt className="text-[13px] text-foreground/60">Sin soporte</dt>
+                  <dd className={`mt-0.5 text-xl font-medium tracking-tight ${h.finance.expensesWithoutReceipt ? "text-red-600" : ""}`}>
+                    {h.finance.expensesWithoutReceipt}
+                  </dd>
+                </div>
+              </dl>
+            </Card>
+          </Link>
+        ))}
+      </div>
     </>
   );
 }

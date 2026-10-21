@@ -4,6 +4,7 @@ Cada decisión con fecha, qué se decidió y por qué. Las más recientes arriba
 
 | Fecha | Decisión | Razón |
 | --- | --- | --- |
+| 2026-10-21 | Diseño aprobado ("versión limpia"): letra Geist, fondo gris claro, tarjetas blancas, negro para lo activo y naranja como único acento. Cinco secciones (Inicio, Casas, Dinero, Ventas, Socios); en el celular, barra inferior con el botón + para registrar. Cada casa tiene etapas y pestañas (Resumen, Gastos, Venta, Reparto, Actividad). Los capítulos de obra muestran solo plata, sin % de avance | Mauricio pidió algo menos básico, con la letra y el estilo de un ejemplo que él escogió, y lo más limpio posible |
 | 2026-10-21 | Mejoras que entran (después de publicar el incremento 1): recibo por foto (la app lee valor, proveedor y fecha y propone el gasto; una persona confirma), simulador de venta (precio → cuánto le queda a cada socio, con la regla del reparto), costo real por m² y por capítulo para presupuestar la siguiente casa, historial de precios por material y proveedor, y enlace de consulta para el comprador (fotos y estado de sus pagos) | Elegidas por Mauricio; el simulador y el costo por m² usan datos que la app ya guarda |
 | 2026-10-21 | Las alertas son solo de lo pendiente por pagar o cobrar: fiados a proveedores, saldo del maestro en cada corte y cuotas vencidas del comprador. No hay alertas de presupuesto | Pedido de Mauricio |
 | 2026-10-21 | Queda fuera por ahora el informe mensual automático para Jesús | Mauricio no lo necesita todavía |

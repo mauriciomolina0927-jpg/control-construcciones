@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { HouseHeader } from "@/components/house-header";
 import { Card } from "@/components/ui";
 import { bogotaToday } from "@/lib/expenses";
 import { loadHouseFinance } from "@/lib/houses";
 import { requireMembership } from "@/lib/membership";
 import { formatPesos, toPesos } from "@/lib/money";
 import { SOURCE_LABELS, type PaymentSource } from "@/lib/sales";
+import type { Stage } from "@/lib/stages";
 import { PaymentForm, SaleForm, VoidPaymentForm } from "./forms";
 
 export default async function HouseSalePage({ params }: PageProps<"/ventas/[houseId]">) {
@@ -34,12 +36,8 @@ export default async function HouseSalePage({ params }: PageProps<"/ventas/[hous
 
   return (
     <>
-      <header className="space-y-1">
-        <Link href="/ventas" className="text-sm text-brand">
-          ‹ Ventas
-        </Link>
-        <h1 className="text-xl font-bold">{house.name}</h1>
-      </header>
+      <HouseHeader house={{ ...house, stage: house.stage as Stage }} active="venta" />
+      <div className="space-y-4 md:max-w-3xl">
 
       {!sale ? (
         <Card className="space-y-3">
@@ -74,7 +72,7 @@ export default async function HouseSalePage({ params }: PageProps<"/ventas/[hous
         <Card className="space-y-2">
           <h2 className="font-semibold">Abonos</h2>
           {(payments ?? []).length === 0 && <p className="text-sm text-foreground/70">Todavía no hay abonos.</p>}
-          <ul className="divide-y divide-black/5 text-sm dark:divide-white/10">
+          <ul className="divide-y divide-line text-sm">
             {(payments ?? []).map((p) => (
               <li key={p.id} className={`space-y-1 py-2 ${p.status === "voided" ? "opacity-60" : ""}`}>
                 <div className="flex justify-between gap-2">
@@ -102,6 +100,7 @@ export default async function HouseSalePage({ params }: PageProps<"/ventas/[hous
           <PaymentForm saleId={sale.id} partners={finance.partners} today={bogotaToday()} />
         </Card>
       )}
+      </div>
     </>
   );
 }
