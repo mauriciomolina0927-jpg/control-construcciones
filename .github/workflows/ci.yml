@@ -18,6 +18,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm --filter @cc/web build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder
+          PIN_SESSION_SECRET: ci-placeholder-secret-of-32-characters
 
   database:
     runs-on: ubuntu-latest
