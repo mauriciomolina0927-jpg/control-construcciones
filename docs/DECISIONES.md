@@ -4,6 +4,7 @@ Cada decisión con fecha, qué se decidió y por qué. Las más recientes arriba
 
 | Fecha | Decisión | Razón |
 | --- | --- | --- |
+| 2026-10-21 | Una sola base de datos en Supabase (proyecto `control-construcciones-prueba`, us-east-1) que es la real; sin proyecto de producción separado. Mitigación: migraciones probadas en CI sobre una base temporal, datos ficticios en una organización "Demo" aislada por permisos, copia semanal a Google Drive | Decisión de Mauricio; el plan gratuito permite 2 proyectos y uno lo usa `finanzas-hogar` |
 | 2026-10-21 | Inicio de sesión: enlace al correo la primera vez en cada celular, luego PIN de 4 dígitos (cifrado en servidor, bloqueo a los 5 intentos, se pide al abrir, tras 15 min sin uso y para aprobar liquidaciones; cierre remoto de sesión) | Fácil para el papá y el socio, con protecciones porque un PIN de 4 dígitos solo es débil |
 | 2026-10-21 | Fase 1 (especificación) aprobada; se agrega el caso 13: lote 65, construcción 75, ingreso neto 180 → socio 85, papá 95 | Ejemplo real de Mauricio, cuadra con la cascada |
 | 2026-10-21 | Borradores de docs/ en la carpeta del proyecto hasta crear el repositorio en la Fase 2 | No hay repositorio aún |
