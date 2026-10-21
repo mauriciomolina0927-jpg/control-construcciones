@@ -1,6 +1,6 @@
 # Arquitectura
 
-Estado: borrador. El stack es una propuesta; se decide en la Fase 2.
+Estado: aprobada el 2026-10-21 (Fase 2).
 
 ## Stack propuesto
 
@@ -9,7 +9,7 @@ Estado: borrador. El stack es una propuesta; se decide en la Fase 2.
 | Interfaz | Next.js + TypeScript como PWA | Expo (app nativa) |
 | Datos, usuarios, archivos | Supabase: PostgreSQL, autenticación, permisos por fila, almacenamiento | Firebase |
 | Liquidación | Funciones puras en TypeScript con pruebas (Vitest) | Vistas SQL |
-| Alojamiento | Vercel + Supabase, proyectos separados de prueba y producción | Render o Railway |
+| Alojamiento | Vercel + una sola base Supabase (`control-construcciones-prueba`, us-east-1); datos ficticios en una organización "Demo" aislada; migraciones probadas en CI antes de aplicarse | Render o Railway |
 | IA | API de Claude para leer recibos; servidor MCP propio con credencial por agente | Otros OCR |
 | WhatsApp | API oficial de WhatsApp Business (Meta), incremento 2; costos por verificar | Registro manual desde el chat |
 | Diseño 3D | glTF/GLB con `<model-viewer>`; fuentes pesadas enlazadas en Drive | Recorridos 360 |
@@ -35,7 +35,7 @@ Montos en pesos enteros; el peso sobrante va al socio con mayor aporte. La liqui
 | `partner` | name, user_id |
 | `house` | name, address, stage (lot, design, construction, for_sale, sold, settled), expected_price |
 | `house_agreement` | house_id, version, profit_split, lot_value, accepted_by, accepted_at |
-| `expense` | house_id (obligatorio), amount, date, kind (lot, construction, sale_cost), category_id, supplier_name, paid_by_partner_id, has_receipt, source, status, replaces_id |
+| `expense` | house_id (obligatorio), amount, date, kind (lot, construction, sale_cost, derivado de la categoría), category (lista fija en `apps/web/src/lib/expenses.ts`), supplier_name, paid_by_partner_id, has_receipt, source, status, replaces_id |
 | `attachment` | owner_type, owner_id, storage_path, mime_type, size, sha256 |
 | `sale` | house_id, buyer_name, agreed_price, status |
 | `sale_payment` | sale_id, amount (negativo = devolución), date, source, received_by_partner_id, status |
@@ -44,6 +44,10 @@ Montos en pesos enteros; el peso sobrante va al socio con mayor aporte. La liqui
 | `audit_log` | actor, action, table, record_id, before, after, at |
 
 Reglas: `organization_id` y permisos por fila en todo; anular en vez de borrar; casa `settled` no acepta movimientos; bitácora por triggers.
+
+## Inicio de sesión
+
+Enlace al correo la primera vez en cada celular; después PIN de 4 dígitos (cifrado, bloqueo a los 5 intentos, se pide al abrir, tras 15 min sin uso y para aprobar liquidaciones).
 
 ## Permisos
 
