@@ -94,3 +94,20 @@ export async function housePartnerIds(supabase: SupabaseClient, houseId: string)
     .maybeSingle();
   return (data?.house_agreement_partners ?? []).map((p: { partner_id: string }) => p.partner_id);
 }
+
+export type HouseOption = { id: string; name: string; partners: { id: string; name: string }[] };
+
+/** Open houses with the partners of their current agreement, for the expense form. */
+export async function openHouseOptions(supabase: SupabaseClient): Promise<HouseOption[]> {
+  const { data: houses } = await supabase
+    .from("houses")
+    .select("id, name, house_agreements (version, house_agreement_partners (partner:partners (id, name)))")
+    .neq("stage", "settled")
+    .order("created_at");
+
+  type Agreement = { version: number; house_agreement_partners: { partner: { id: string; name: string } }[] };
+  return (houses ?? []).map((h) => {
+    const latest = (h.house_agreements as unknown as Agreement[]).toSorted((a, b) => b.version - a.version)[0];
+    return { id: h.id, name: h.name, partners: (latest?.house_agreement_partners ?? []).map((p) => p.partner) };
+  });
+}

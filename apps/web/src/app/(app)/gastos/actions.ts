@@ -7,7 +7,7 @@ import { bogotaToday, kindOf, LAST_PAYER_COOKIE } from "@/lib/expenses";
 import { housePartnerIds } from "@/lib/houses";
 import { requireWriter } from "@/lib/membership";
 import { parsePesos } from "@/lib/money";
-import { checkReceipt, storeReceipt } from "@/lib/receipts";
+import { checkReceipt, storeReceipt, whatsappReceipt } from "@/lib/receipts";
 
 export type ExpenseFormState = { error?: string };
 
@@ -21,6 +21,7 @@ export async function createExpense(_: ExpenseFormState, form: FormData): Promis
   const supplier = String(form.get("supplier") ?? "").trim() || null;
   const description = String(form.get("description") ?? "").trim() || null;
   const replacesId = String(form.get("replaces_id") ?? "") || null;
+  const suggestionId = String(form.get("suggestion_id") ?? "") || null;
 
   if (!amount || amount <= 0n) return { error: "Escribe el valor en pesos, sin centavos." };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(spentOn) || spentOn > bogotaToday()) return { error: "Revisa la fecha." };
@@ -51,6 +52,7 @@ export async function createExpense(_: ExpenseFormState, form: FormData): Promis
       description,
       paid_by_partner_id: paidBy,
       replaces_id: replacesId,
+      source: suggestionId ? "whatsapp" : "manual",
     })
     .select("id")
     .single();
@@ -63,17 +65,33 @@ export async function createExpense(_: ExpenseFormState, form: FormData): Promis
   (await cookies()).set(LAST_PAYER_COOKIE, paidBy, { path: "/gastos", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
 
   let notice = "guardado";
-  if (receipt) {
+  // A confirmed WhatsApp expense keeps the photo that came with the message, unless another one was chosen.
+  const kept = receipt ?? (suggestionId ? await whatsappReceipt(supabase, suggestionId) : null);
+  if (kept) {
     const stored = await storeReceipt(
       supabase,
       { organizationId: membership.organization.id, houseId, type: "expense", id: expense.id },
-      receipt,
+      kept,
     );
     if (!stored) notice = "sin-foto";
   }
 
+  if (suggestionId) {
+    const { error: reviewError } = await supabase
+      .from("expense_suggestions")
+      .update({ status: "confirmed", expense_id: expense.id })
+      .eq("id", suggestionId)
+      .eq("status", "pending");
+    if (reviewError) notice = "sin-cerrar";
+  }
+
   revalidatePath("/dinero");
   revalidatePath(`/casas/${houseId}`);
+  revalidatePath("/");
+  if (suggestionId) {
+    revalidatePath("/dinero/revisar");
+    redirect(`/dinero/revisar?aviso=${notice === "guardado" ? "confirmado" : notice}`);
+  }
   redirect(`/dinero/${expense.id}?aviso=${notice}`);
 }
 
@@ -128,4 +146,14 @@ export async function addReceipt(_: ActionState, form: FormData): Promise<Action
   revalidatePath(`/dinero/${id}`);
   revalidatePath(`/casas/${expense.house_id}`);
   return { ok: "Soporte agregado." };
+}
+
+export async function discardSuggestion(form: FormData): Promise<void> {
+  const id = String(form.get("id") ?? "");
+  const ctx = await requireWriter();
+  if (!ctx) return;
+  await ctx.supabase.from("expense_suggestions").update({ status: "discarded" }).eq("id", id).eq("status", "pending");
+  revalidatePath("/dinero/revisar");
+  revalidatePath("/");
+  redirect("/dinero/revisar?aviso=descartado");
 }

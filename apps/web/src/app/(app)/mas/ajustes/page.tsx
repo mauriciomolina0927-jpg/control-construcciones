@@ -2,15 +2,16 @@ import { redirect } from "next/navigation";
 import { Card } from "@/components/ui";
 import { requireMembership } from "@/lib/membership";
 import { ROLE_LABELS, type Role } from "@/lib/roles";
+import { formatPhone } from "@/lib/whatsapp/phone";
 import { cancelInvitation } from "./actions";
-import { AddPartnerForm, InviteForm } from "./forms";
+import { AddPartnerForm, InviteForm, WhatsappPhoneForm } from "./forms";
 
 export default async function SettingsPage() {
   const { supabase, membership } = await requireMembership();
   if (membership?.role !== "admin") redirect("/mas");
 
   const [{ data: partners }, { data: invitations }] = await Promise.all([
-    supabase.from("partners").select("id, name, user_id").order("created_at"),
+    supabase.from("partners").select("id, name, user_id, whatsapp_phone").order("created_at"),
     supabase.from("invitations").select("id, email, role, accepted_at, partner_id").order("created_at"),
   ]);
   const partnerName = new Map((partners ?? []).map((p) => [p.id, p.name]));
@@ -23,13 +24,19 @@ export default async function SettingsPage() {
         <h2 className="font-semibold">Socios</h2>
         <ul className="divide-y divide-line text-sm">
           {(partners ?? []).map((p) => (
-            <li key={p.id} className="flex justify-between py-2">
-              <span>{p.name}</span>
-              <span className="text-foreground/60">{p.user_id ? "Con acceso" : "Sin acceso"}</span>
+            <li key={p.id} className="space-y-2 py-3">
+              <div className="flex justify-between">
+                <span>{p.name}</span>
+                <span className="text-foreground/60">{p.user_id ? "Con acceso" : "Sin acceso"}</span>
+              </div>
+              <WhatsappPhoneForm partnerId={p.id} phone={p.whatsapp_phone ? formatPhone(p.whatsapp_phone) : null} />
             </li>
           ))}
           {!partners?.length && <li className="py-2 text-foreground/60">Todavía no hay socios.</li>}
         </ul>
+        <p className="text-xs text-foreground/60">
+          El celular es el que cada socio usa para mandar gastos al WhatsApp de la empresa. Solo esos números son atendidos.
+        </p>
         <AddPartnerForm />
       </Card>
 

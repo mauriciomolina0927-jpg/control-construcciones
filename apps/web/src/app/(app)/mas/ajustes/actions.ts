@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireMembership } from "@/lib/membership";
 import type { Role } from "@/lib/roles";
+import { normalizePhone } from "@/lib/whatsapp/phone";
 
 export type FormState = { error?: string; ok?: string };
 
@@ -50,4 +51,18 @@ export async function cancelInvitation(form: FormData): Promise<void> {
   const { supabase } = await requireAdmin();
   await supabase.from("invitations").delete().eq("id", id).is("accepted_at", null);
   revalidatePath("/mas/ajustes");
+}
+
+export async function setWhatsappPhone(_: FormState, form: FormData): Promise<FormState> {
+  const partnerId = String(form.get("partner_id") ?? "");
+  const text = String(form.get("phone") ?? "").trim();
+  const phone = text ? normalizePhone(text) : null;
+  if (text && !phone) return { error: "Escribe el celular con 10 dígitos, por ejemplo 300 111 2233." };
+
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("partners").update({ whatsapp_phone: phone }).eq("id", partnerId);
+  if (error) return { error: error.code === "23505" ? "Ese número ya es de otro socio." : "No pudimos guardar el número." };
+
+  revalidatePath("/mas/ajustes");
+  return { ok: phone ? "Número guardado. Ya puede escribir al WhatsApp de la empresa." : "Número quitado." };
 }
