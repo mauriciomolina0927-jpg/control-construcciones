@@ -7,9 +7,12 @@ export default async function MorePage() {
   const { membership } = await requireMembership();
 
   return (
-    <>
-      <h1 className="text-xl font-bold">Más</h1>
-      <Card className="divide-y divide-black/5 p-0 dark:divide-white/10">
+    <div className="mx-auto w-full max-w-2xl space-y-4">
+      <h1 className="text-[28px] font-normal tracking-[-0.03em]">Socios y cuenta</h1>
+      <Card className="divide-y divide-line p-0">
+        <Link href="/ventas" className="block px-5 py-4 md:hidden">
+          Ventas y abonos
+        </Link>
         {membership?.role === "admin" && (
           <Link href="/mas/ajustes" className="block px-5 py-4">
             Socios e invitaciones
@@ -19,6 +22,6 @@ export default async function MorePage() {
           <button className="block w-full px-5 py-4 text-left">Salir y cambiar de correo</button>
         </form>
       </Card>
-    </>
+    </div>
   );
 }
