@@ -1,4 +1,7 @@
 {
+  "/(app)/casas/[id]/actividad/page": "/casas/[id]/actividad",
+  "/(app)/casas/[id]/page": "/casas/[id]",
+  "/(app)/casas/nueva/page": "/casas/nueva",
   "/(app)/casas/page": "/casas",
   "/(app)/dinero/page": "/dinero",
   "/(app)/mas/ajustes/page": "/mas/ajustes",

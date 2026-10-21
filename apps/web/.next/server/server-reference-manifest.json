@@ -1,5 +1,29 @@
 {
   "node": {
+    "4003ab522ffe9161530acb3767f16f43622d16f167": {
+      "workers": {
+        "app/(app)/casas/[id]/page": {
+          "moduleId": 87189,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/casas/actions.ts",
+      "exportedName": "changeStage"
+    },
+    "606d9ebdf467b76d5a9ae9ec863a62069a1fe57a24": {
+      "workers": {
+        "app/(app)/casas/[id]/page": {
+          "moduleId": 87189,
+          "async": false
+        },
+        "app/(app)/casas/nueva/page": {
+          "moduleId": 90020,
+          "async": false
+        }
+      },
+      "filename": "apps/web/src/app/(app)/casas/actions.ts",
+      "exportedName": "createHouse"
+    },
     "0091841b94d395f88b2c62f838faab76bc8b68c8dc": {
       "workers": {
         "app/(app)/mas/page": {

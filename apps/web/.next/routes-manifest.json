@@ -21,7 +21,24 @@
     "afterFiles": [],
     "fallback": []
   },
-  "dynamicRoutes": [],
+  "dynamicRoutes": [
+    {
+      "page": "/casas/[id]",
+      "regex": "^/casas/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/casas/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/casas/[id]/actividad",
+      "regex": "^/casas/([^/]+?)/actividad(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/casas/(?<nxtPid>[^/]+?)/actividad(?:/)?$"
+    }
+  ],
   "staticRoutes": [
     {
       "page": "/",
@@ -52,6 +69,12 @@
       "regex": "^/casas(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/casas(?:/)?$"
+    },
+    {
+      "page": "/casas/nueva",
+      "regex": "^/casas/nueva(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/casas/nueva(?:/)?$"
     },
     {
       "page": "/dinero",
