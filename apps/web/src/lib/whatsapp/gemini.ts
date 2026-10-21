@@ -6,7 +6,7 @@ import type { MediaType } from "@/lib/whatsapp/webhook";
 
 const API = "https://generativelanguage.googleapis.com/v1beta/models";
 // The free tier's model names change over time; GEMINI_MODEL overrides this one without a deploy of code.
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.8-flash";
 
 const nullable = (schema: object) => ({ ...schema, nullable: true });
 
@@ -98,7 +98,7 @@ export async function interpretWithGemini(
     body: JSON.stringify({
       system_instruction: { parts: [{ text: SYSTEM }] },
       contents: [{ role: "user", parts }],
-      generationConfig: { responseMimeType: "application/json", responseSchema: DECISION_SCHEMA, temperature: 0 },
+      generationConfig: { responseMimeType: "application/json", responseSchema: DECISION_SCHEMA },
     }),
     signal: AbortSignal.timeout(30_000),
   });
