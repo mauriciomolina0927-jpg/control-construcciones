@@ -1,13 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import { supabaseKey, supabaseUrl } from "@/lib/env";
 import { bogotaToday, detectReceiptType, MAX_RECEIPT_BYTES } from "@/lib/expenses";
-import { interpret, type WhatsappContext } from "@/lib/whatsapp/agent";
+import { interpretWithGemini } from "@/lib/whatsapp/gemini";
 import { downloadMedia, sendText } from "@/lib/whatsapp/meta";
 import { checkProposal, confirmationText } from "@/lib/whatsapp/proposal";
+import { interpret, type Decision, type WhatsappContext } from "@/lib/whatsapp/reader";
 import { isKeptMedia, type IncomingMessage, type MediaType } from "@/lib/whatsapp/webhook";
-
-const FALLBACK_REPLY =
-  "Recibí tu mensaje, pero no lo pude leer bien. Mauricio lo revisa en la app. Si quieres, escríbelo así: valor, qué fue y para cuál casa.";
 
 function webhookToken(): string {
   const value = process.env.WHATSAPP_WEBHOOK_TOKEN;
@@ -63,15 +61,13 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
   }
 
   const today = bogotaToday();
-  let decision;
+  // Gemini reads photos and free text; if it fails or hits the free tier's daily limit, the fixed rules read the text.
+  let decision: Decision;
   try {
-    decision = await interpret(ctx, { text: message.text, media }, today);
+    decision = await interpretWithGemini(ctx, { text: message.text, media }, today);
   } catch (error) {
-    console.error("whatsapp interpret failed", error);
-    // Keep the message in the inbox with nothing filled in, so it is not lost.
-    await db.rpc("whatsapp_suggest", { token, message: messageId, suggestion: { missing: ["amount", "house_id", "category"] } });
-    await reply(FALLBACK_REPLY);
-    return;
+    console.error("whatsapp gemini failed, using the fixed rules", error);
+    decision = interpret(ctx, { text: message.text, media }, today);
   }
 
   if (decision.intent !== "expenses" || decision.expenses.length === 0) {

@@ -1,42 +1,18 @@
-import Anthropic from "@anthropic-ai/sdk";
+// Reads a WhatsApp message with Gemini (Google), on its free tier. Anything it returns is checked against
+// the database's own lists (proposal.ts) and still waits for a person in the app.
 import { CATEGORIES } from "@/lib/expenses";
+import type { Decision, WhatsappContext } from "@/lib/whatsapp/reader";
 import type { MediaType } from "@/lib/whatsapp/webhook";
 
-/** What the database tells the agent about the person writing (public.whatsapp_context). */
-export type WhatsappContext = {
-  organization_id: string;
-  partner_id: string;
-  partner_name: string;
-  partners: { id: string; name: string }[];
-  houses: { id: string; name: string; stage: string; lot: number; construction: number; without_receipt: number }[];
-  recent: { direction: "in" | "out"; body: string | null; has_media: boolean; at: string }[];
-  open: { id: string; amount: number | null; house_id: string | null; category: string | null; supplier_name: string | null; missing: string[]; at: string }[];
-};
+const API = "https://generativelanguage.googleapis.com/v1beta/models";
+// The free tier's model names change over time; GEMINI_MODEL overrides this one without a deploy of code.
+const DEFAULT_MODEL = "gemini-3.8-flash";
 
-export type ProposedExpense = {
-  update_id: string | null;
-  amount: number | null;
-  house_id: string | null;
-  category: string | null;
-  supplier_name: string | null;
-  description: string | null;
-  spent_on: string | null;
-  paid_by_partner_id: string | null;
-};
+const nullable = (schema: object) => ({ ...schema, nullable: true });
 
-export type Decision = {
-  intent: "expenses" | "question" | "other";
-  expenses: ProposedExpense[];
-  answer: string | null;
-};
-
-const MODEL = "claude-opus-5-5";
-
-const nullable = (schema: object) => ({ anyOf: [schema, { type: "null" }] });
-
+// Gemini's response schema (an OpenAPI subset: "nullable" instead of a null type).
 const DECISION_SCHEMA = {
   type: "object",
-  additionalProperties: false,
   required: ["intent", "expenses", "answer"],
   properties: {
     intent: { type: "string", enum: ["expenses", "question", "other"] },
@@ -44,7 +20,6 @@ const DECISION_SCHEMA = {
       type: "array",
       items: {
         type: "object",
-        additionalProperties: false,
         required: ["update_id", "amount", "house_id", "category", "supplier_name", "description", "spent_on", "paid_by_partner_id"],
         properties: {
           update_id: nullable({ type: "string" }),
@@ -103,34 +78,40 @@ function contextText(ctx: WhatsappContext, today: string): string {
   ].join("\n\n");
 }
 
-/** Asks Claude what a message means. Throws on API errors; the caller answers the person with a fallback. */
-export async function interpret(
+/** Asks Gemini what a message means. Throws on any API error or limit; the caller falls back to the fixed rules. */
+export async function interpretWithGemini(
   ctx: WhatsappContext,
   message: { text: string; media: { type: MediaType; base64: string } | null },
   today: string,
 ): Promise<Decision> {
-  const client = new Anthropic();
-  const content: Anthropic.Beta.BetaContentBlockParam[] = [];
-  if (message.media?.type === "application/pdf") {
-    content.push({ type: "document", source: { type: "base64", media_type: "application/pdf", data: message.media.base64 } });
-  } else if (message.media) {
-    content.push({ type: "image", source: { type: "base64", media_type: message.media.type, data: message.media.base64 } });
-  }
-  content.push({ type: "text", text: `${contextText(ctx, today)}\n\nNew message:\n${message.text || "(only the attachment)"}` });
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) throw new Error("Missing environment variable GEMINI_API_KEY");
+  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
 
-  const response = await client.beta.messages.create({
-    model: MODEL,
-    max_tokens: 4000,
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
-    system: SYSTEM,
-    output_config: { effort: "low", format: { type: "json_schema", schema: DECISION_SCHEMA } },
-    messages: [{ role: "user", content }],
+  const parts: object[] = [];
+  if (message.media) parts.push({ inline_data: { mime_type: message.media.type, data: message.media.base64 } });
+  parts.push({ text: `${contextText(ctx, today)}\n\nNew message:\n${message.text || "(only the attachment)"}` });
+
+  const response = await fetch(`${API}/${encodeURIComponent(model)}:generateContent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: SYSTEM }] },
+      contents: [{ role: "user", parts }],
+      generationConfig: { responseMimeType: "application/json", responseSchema: DECISION_SCHEMA },
+    }),
+    signal: AbortSignal.timeout(30_000),
   });
-  if (response.stop_reason === "refusal" || response.stop_reason === "max_tokens") {
-    throw new Error(`Claude stopped: ${response.stop_reason}`);
-  }
-  const text = response.content.find((b) => b.type === "text");
-  if (!text || text.type !== "text") throw new Error("Claude returned no text");
-  return JSON.parse(text.text) as Decision;
+  if (!response.ok) throw new Error(`Gemini ${response.status}: ${(await response.text()).slice(0, 300)}`);
+
+  const data = (await response.json()) as {
+    candidates?: { finishReason?: string; content?: { parts?: { text?: string }[] } }[];
+  };
+  const candidate = data.candidates?.[0];
+  if (candidate?.finishReason && candidate.finishReason !== "STOP") throw new Error(`Gemini stopped: ${candidate.finishReason}`);
+  const text = candidate?.content?.parts?.map((p) => p.text ?? "").join("");
+  if (!text) throw new Error("Gemini returned no text");
+  const decision = JSON.parse(text) as Decision;
+  if (!Array.isArray(decision.expenses)) throw new Error("Gemini returned an unexpected shape");
+  return decision;
 }
