@@ -1,11 +1,11 @@
 import { CATEGORIES } from "@/lib/expenses";
 import { formatPesos } from "@/lib/money";
-import type { ProposedExpense, WhatsappContext } from "@/lib/whatsapp/agent";
+import type { ProposedExpense, WhatsappContext } from "@/lib/whatsapp/reader";
 
 /** The fields a suggestion needs before it can be confirmed. */
 export type MissingField = "amount" | "house_id" | "category";
 
-/** The payload for public.whatsapp_suggest, after checking what Claude proposed against the database's own lists. */
+/** The payload for public.whatsapp_suggest, after checking what the reader proposed against the database's own lists. */
 export type CheckedProposal = {
   updateId: string | null;
   suggestion: {
@@ -35,7 +35,7 @@ export type SuggestionSummary = {
 const MAX_AMOUNT = 10_000_000_000; // 10.000 millones: anything larger is a misread
 
 /**
- * Keeps only values that exist: a house, partner or category Claude made up becomes null, and so
+ * Keeps only values that exist: a house, partner or category the reader made up becomes null, and so
  * does an impossible amount or date. With a single open house, that house is assumed.
  */
 export function checkProposal(p: ProposedExpense, ctx: WhatsappContext, today: string): CheckedProposal {

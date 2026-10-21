@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import type { ProposedExpense, WhatsappContext } from "../src/lib/whatsapp/agent";
+import type { ProposedExpense, WhatsappContext } from "../src/lib/whatsapp/reader";
 import { formatPesos } from "../src/lib/money";
 import { checkProposal, confirmationText } from "../src/lib/whatsapp/proposal";
 import { incomingMessages, isSignatureValid } from "../src/lib/whatsapp/webhook";
@@ -77,7 +77,7 @@ describe("incoming messages", () => {
   });
 });
 
-describe("checking what Claude proposed", () => {
+describe("checking what the reader proposed", () => {
   const today = "2026-10-21";
 
   it("drops made-up houses, partners and categories, and impossible amounts or dates", () => {
