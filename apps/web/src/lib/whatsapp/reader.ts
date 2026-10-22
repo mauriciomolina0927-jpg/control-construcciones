@@ -12,6 +12,21 @@ export type WhatsappContext = {
   houses: { id: string; name: string; stage: string; lot: number; construction: number; without_receipt: number }[];
   recent: { direction: "in" | "out"; body: string | null; has_media: boolean; at: string }[];
   open: { id: string; amount: number | null; house_id: string | null; category: string | null; supplier_name: string | null; missing: string[]; at: string }[];
+  /** Recent active expenses and pending suggestions, oldest first: what a partner may ask to void. */
+  voidable?: Voidable[];
+  /** The void request waiting for a "sí", if any (30 minutes). */
+  void_request?: { id: string; kind: "expense" | "suggestion"; target_id: string } | null;
+};
+
+export type Voidable = {
+  kind: "expense" | "suggestion";
+  id: string;
+  amount: number | null;
+  house_id: string | null;
+  category: string | null;
+  supplier_name: string | null;
+  spent_on: string | null;
+  at: string;
 };
 
 export type ProposedExpense = {
@@ -26,9 +41,12 @@ export type ProposedExpense = {
 };
 
 export type Decision = {
-  intent: "expenses" | "question" | "other";
+  intent: "expenses" | "question" | "void" | "other";
   expenses: ProposedExpense[];
   answer: string | null;
+  /** For intent "void": the id of one item in ctx.voidable, or null when it is not clear which. */
+  void_id?: string | null;
+  void_reason?: string | null;
 };
 
 export const HELP_TEXT =
@@ -174,6 +192,11 @@ export function interpret(
 ): Decision {
   const text = message.text.trim();
   const plain = normalize(text);
+  if (/\b(anula|anular|anulalo|borra|borrar|borralo|elimina|eliminar|quita|quitalo)\b/.test(plain)) {
+    // The fixed rules only understand "the last one"; anything more specific is asked back.
+    const last = /\bultim/.test(plain) ? ctx.voidable?.at(-1) : undefined;
+    return { intent: "void", expenses: [], answer: null, void_id: last?.id ?? null, void_reason: null };
+  }
   const latest = ctx.open.at(-1);
 
   if (latest && !message.media) {

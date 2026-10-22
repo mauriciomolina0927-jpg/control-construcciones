@@ -18,7 +18,7 @@ export const DECISION_SCHEMA = {
   type: "object",
   required: ["intent", "expenses", "answer"],
   properties: {
-    intent: { type: "string", enum: ["expenses", "question", "other"] },
+    intent: { type: "string", enum: ["expenses", "question", "void", "other"] },
     expenses: {
       type: "array",
       items: {
@@ -37,6 +37,8 @@ export const DECISION_SCHEMA = {
       },
     },
     answer: nullable({ type: "string" }),
+    void_id: nullable({ type: "string" }),
+    void_reason: nullable({ type: "string" }),
   },
 };
 
@@ -61,7 +63,8 @@ intent:
 - "expenses": the message reports one or more expenses, or completes an open suggestion. One entry per expense.
 - "question": the person asks about the business (how much a house has cost, what is missing). Write "answer" in short, warm Colombian Spanish using only the figures given; say you do not have it if it is not there.
 - "other": greetings, thanks, anything else. "answer" is a short reply in the voice above.
-For "expenses", "answer" is null: the app writes the confirmation itself.`;
+- "void": the person asks to void, delete or undo an expense ("borra el último", "anula el flete de ayer", "ese cemento estaba repetido"). Put in void_id the id of exactly one item from "Can be voided" that matches; if it is not clear which one, leave void_id null. void_reason: a few words of why, if they say it. The app asks for a "sí" before voiding.
+For "expenses" and "void", "answer" is null: the app writes the reply itself.`;
 
 export function contextText(ctx: WhatsappContext, today: string): string {
   const houses = ctx.houses
@@ -74,12 +77,17 @@ export function contextText(ctx: WhatsappContext, today: string): string {
   const open = ctx.open
     .map((s) => `- id ${s.id}: ${s.amount ?? "?"} pesos, casa ${s.house_id ?? "?"}, ${s.category ?? "?"}, falta ${s.missing.join(", ")}`)
     .join("\n");
+  const houseName = (id: string | null) => ctx.houses.find((h) => h.id === id)?.name ?? "?";
+  const voidable = (ctx.voidable ?? [])
+    .map((v) => `- id ${v.id} (${v.kind === "expense" ? "gasto confirmado" : "sugerencia sin confirmar"}): ${v.amount ?? "?"} pesos, ${houseName(v.house_id)}, ${v.category ?? "?"}${v.supplier_name ? `, ${v.supplier_name}` : ""}, día ${v.spent_on ?? "?"}, anotado ${v.at}`)
+    .join("\n");
   return [
     `Today in Colombia: ${today}. Writing: ${ctx.partner_name} (id ${ctx.partner_id}).`,
     `Open houses:\n${houses || "(none)"}`,
     `Partners:\n${partners}`,
     `Categories: ${CATEGORIES.map((c) => c.name).join("; ")}`,
     `Suggestions still missing data:\n${open || "(none)"}`,
+    `Can be voided (oldest first; the last one is the most recent):\n${voidable || "(none)"}`,
     `Conversation in the last 24 hours, oldest first:\n${recent || "(none)"}`,
   ].join("\n\n");
 }

@@ -5,7 +5,8 @@ import { interpretWithGemini } from "@/lib/whatsapp/gemini";
 import { interpretWithGroq } from "@/lib/whatsapp/groq";
 import { downloadMedia, sendText } from "@/lib/whatsapp/meta";
 import { checkProposal, confirmationText } from "@/lib/whatsapp/proposal";
-import { interpret, type Decision, type WhatsappContext } from "@/lib/whatsapp/reader";
+import { formatPesos } from "@/lib/money";
+import { interpret, normalize, type Decision, type Voidable, type WhatsappContext } from "@/lib/whatsapp/reader";
 import { isKeptMedia, type IncomingMessage, type MediaType } from "@/lib/whatsapp/webhook";
 
 function webhookToken(): string {
@@ -61,6 +62,15 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
     return;
   }
 
+  // A "sí" right after "¿Anulo ...?" voids it; nothing else does.
+  const lastOut = ctx.recent.filter((m) => m.direction === "out").at(-1);
+  if (ctx.void_request && !media && lastOut?.body?.startsWith("¿Anulo") && isYes(message.text)) {
+    const { data: done, error } = await db.rpc("whatsapp_confirm_void", { token, phone: message.from, request: ctx.void_request.id });
+    if (error) throw new Error(`whatsapp_confirm_void: ${error.message}`);
+    await reply(done ? "✅ Anulado. Ya no cuenta en la casa; queda en el historial de la app." : "Ese ya no se puede anular (pasó la media hora o ya estaba anulado). Pídemelo otra vez.");
+    return;
+  }
+
   const today = bogotaToday();
   // Text goes to Groq first (fast, free) and then Gemini; photos go to Gemini only, which reads images.
   // If every model fails or hits its free limit, the fixed rules read the text.
@@ -78,6 +88,25 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
     }
   }
   decision ??= interpret(ctx, { text: message.text, media }, today);
+
+  if (decision.intent === "void") {
+    const target = ctx.voidable?.find((v) => v.id === decision.void_id);
+    if (!target) {
+      const last = (ctx.voidable ?? []).slice(-3).reverse();
+      await reply(last.length
+        ? `¿Cuál anulo? Dímelo con el valor o el día. Los últimos:\n${last.map((v) => `• ${describe(v, ctx)}`).join("\n")}`
+        : "No veo gastos recientes para anular. Si es uno viejo, anúlalo en la app, en Dinero.");
+      return;
+    }
+    const { data: requestId, error } = await db.rpc("whatsapp_request_void", {
+      token, phone: message.from, target_kind: target.kind, target_id: target.id, reason: decision.void_reason ?? null,
+    });
+    if (error) throw new Error(`whatsapp_request_void: ${error.message}`);
+    await reply(requestId
+      ? `¿Anulo ${describe(target, ctx)}? Responde *sí* para anularlo.`
+      : "Ese ya no se puede anular desde aquí. Revísalo en la app, en Dinero.");
+    return;
+  }
 
   if (decision.intent !== "expenses" || decision.expenses.length === 0) {
     if (decision.answer) await reply(decision.answer);
@@ -97,4 +126,16 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
     replies.push(confirmationText(checked.merged, ctx));
   }
   await reply(replies.join("\n\n"));
+}
+
+function isYes(text: string): boolean {
+  return /^(si|sii+|sip|claro|dale|confirmo|hagale|hagalo|anulalo|ok|okay|de una)\b/.test(normalize(text.trim())) && text.length < 40;
+}
+
+/** "el flete de $80.000 (Casa 5, 2026-10-22)" — enough for the person to recognize it. */
+function describe(v: Voidable, ctx: WhatsappContext): string {
+  const what = v.supplier_name || v.category || (v.kind === "suggestion" ? "gasto sin confirmar" : "gasto");
+  const amount = v.amount ? formatPesos(BigInt(v.amount)) : "sin valor";
+  const house = ctx.houses.find((h) => h.id === v.house_id)?.name;
+  return `${what} de *${amount}* (${[house, v.spent_on].filter(Boolean).join(", ")})`;
 }

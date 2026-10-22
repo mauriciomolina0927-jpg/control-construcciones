@@ -121,3 +121,26 @@ describe("what a whole message means", () => {
     expect(read("hola").answer).toContain("850 mil cemento El Prado");
   });
 });
+
+describe("asking to void", () => {
+  const withVoidable: WhatsappContext = {
+    ...ctx,
+    voidable: [
+      { kind: "expense", id: "e1", amount: 850000, house_id: null, category: "Materiales", supplier_name: null, spent_on: today, at: "1" },
+      { kind: "expense", id: "e2", amount: 80000, house_id: null, category: "Transporte y acarreos", supplier_name: null, spent_on: today, at: "2" },
+    ],
+  };
+
+  it("points to the most recent one when they say the last", () => {
+    const d = read("borra el último, estaba repetido", withVoidable);
+    expect(d.intent).toBe("void");
+    expect(d.void_id).toBe("e2");
+  });
+
+  it("is never read as a new expense, even with an amount", () => {
+    const d = read("anula el cemento de 850", withVoidable);
+    expect(d.intent).toBe("void");
+    expect(d.expenses).toHaveLength(0);
+    expect(d.void_id).toBeNull();
+  });
+});
