@@ -24,9 +24,23 @@ function database() {
 }
 
 /** Handles one incoming message from start to finish: record, read, propose, answer. Unknown phones are ignored. */
-export async function handleMessage(message: IncomingMessage): Promise<void> {
+export async function handleMessage(incoming: IncomingMessage): Promise<void> {
   const db = database();
   const token = webhookToken();
+
+  // Without a phone, the partner linked to the user id gives it; replies still go to the user id.
+  let message = incoming;
+  if (!message.from && message.userId) {
+    const { data: phone, error } = await db.rpc("whatsapp_phone_for_user", { token, user_id: message.userId });
+    if (error) throw new Error(`whatsapp_phone_for_user: ${error.message}`);
+    if (!phone) {
+      // The whole id, so it can be linked to the partner in Socios; it is not a phone number.
+      console.warn("whatsapp unknown user id", message.userId);
+      return;
+    }
+    message = { ...message, from: phone as string };
+  }
+  const recipient = incoming.from ? { phone: incoming.from } : { userId: incoming.userId as string };
 
   const { data: context, error: contextError } = await db.rpc("whatsapp_context", { token, phone: message.from });
   if (contextError) throw new Error(`whatsapp_context: ${contextError.message}`);
@@ -57,7 +71,7 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
   if (!messageId) return; // WhatsApp delivered it again; it was handled the first time.
 
   const reply = async (body: string) => {
-    const sentId = await sendText(message.from, body);
+    const sentId = await sendText(recipient, body);
     await db.rpc("whatsapp_record", { token, phone: message.from, wa_message_id: sentId, direction: "out", body });
   };
 

@@ -67,10 +67,10 @@ describe("incoming messages", () => {
       ],
     };
     expect(incomingMessages(payload)).toEqual([
-      { id: "1", from: "573001112233", kind: "text", text: "Cemento 850 mil", mediaId: null, mimeType: null },
-      { id: "2", from: "573001112233", kind: "image", text: "El Prado", mediaId: "m1", mimeType: "image/jpeg" },
-      { id: "3", from: "573001112233", kind: "text", text: "El Prado", mediaId: null, mimeType: null },
-      { id: "4", from: "573001112233", kind: "unsupported", text: "", mediaId: null, mimeType: null },
+      { id: "1", from: "573001112233", userId: null, kind: "text", text: "Cemento 850 mil", mediaId: null, mimeType: null },
+      { id: "2", from: "573001112233", userId: null, kind: "image", text: "El Prado", mediaId: "m1", mimeType: "image/jpeg" },
+      { id: "3", from: "573001112233", userId: null, kind: "text", text: "El Prado", mediaId: null, mimeType: null },
+      { id: "4", from: "573001112233", userId: null, kind: "unsupported", text: "", mediaId: null, mimeType: null },
     ]);
     expect(incomingMessages({})).toEqual([]);
     expect(incomingMessages(null)).toEqual([]);
@@ -142,7 +142,19 @@ describe("incomingMessages without from", () => {
       messages: [{ id: "wamid.1", from_user_id: "CO.123", type: "text", text: { body: "hola" } }],
     } }] }] };
     expect(incomingMessages(payload)).toEqual([
-      { id: "wamid.1", from: "573008051142", kind: "text", text: "hola", mediaId: null, mimeType: null },
+      { id: "wamid.1", from: "573008051142", userId: "CO.123", kind: "text", text: "hola", mediaId: null, mimeType: null },
+    ]);
+  });
+});
+
+describe("incomingMessages with only a user id", () => {
+  it("keeps the message with an empty phone and the user id", () => {
+    const payload = { entry: [{ changes: [{ value: {
+      contacts: [{ user_id: "CO.123", profile: { name: "Miguel" } }],
+      messages: [{ id: "wamid.2", from_user_id: "CO.123", type: "text", text: { body: "hola" } }],
+    } }] }] };
+    expect(incomingMessages(payload)).toEqual([
+      { id: "wamid.2", from: "", userId: "CO.123", kind: "text", text: "hola", mediaId: null, mimeType: null },
     ]);
   });
 });
