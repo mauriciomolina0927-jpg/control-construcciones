@@ -22,14 +22,19 @@ export async function downloadMedia(mediaId: string, maxBytes: number): Promise<
   return bytes.byteLength > maxBytes ? null : bytes;
 }
 
-/** Sends a text message. Returns the WhatsApp id of the message sent, or null if it failed. */
-export async function sendText(to: string, body: string): Promise<string | null> {
+/** Sends a text message to a phone, or to a user id when the person's phone never came (Meta's "recipient").
+ * Returns the WhatsApp id of the message sent, or null if it failed. */
+export async function sendText(to: { phone: string } | { userId: string }, body: string): Promise<string | null> {
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   if (!phoneNumberId) throw new Error("Missing environment variable WHATSAPP_PHONE_NUMBER_ID");
   const response = await fetch(`${GRAPH}/${phoneNumberId}/messages`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token()}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ messaging_product: "whatsapp", to, type: "text", text: { body, preview_url: false } }),
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      ...("phone" in to ? { to: to.phone } : { recipient: to.userId }),
+      type: "text", text: { body, preview_url: false },
+    }),
   });
   if (!response.ok) {
     // Meta explains the failure in the body (expired token, missing permission, number not allowed).

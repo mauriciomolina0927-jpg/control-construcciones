@@ -3,7 +3,10 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 /** One message a person sent to the company number, already reduced to what the app uses. */
 export type IncomingMessage = {
   id: string;
+  /** The sender's phone, digits only; empty when Meta sent only a user id. */
   from: string;
+  /** Meta's business-scoped user id (like "CO.123..."), when it came. */
+  userId: string | null;
   kind: "text" | "image" | "document" | "unsupported";
   text: string;
   mediaId: string | null;
@@ -51,8 +54,9 @@ export function incomingMessages(payload: unknown): IncomingMessage[] {
           m.from ??
           contacts.find((c) => m.from_user_id && c.user_id === m.from_user_id)?.wa_id ??
           (contacts.length === 1 ? contacts[0].wa_id : undefined);
-        if (!m.id || !from) continue;
-        const base = { id: m.id, from: from.replace(/\D/g, ""), mediaId: null, mimeType: null };
+        const userId = m.from_user_id ?? null;
+        if (!m.id || (!from && !userId)) continue;
+        const base = { id: m.id, from: (from ?? "").replace(/\D/g, ""), userId, mediaId: null, mimeType: null };
         if (m.type === "text") {
           out.push({ ...base, kind: "text", text: m.text?.body ?? "" });
         } else if (m.type === "image" || m.type === "document") {
