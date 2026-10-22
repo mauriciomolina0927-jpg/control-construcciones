@@ -1,5 +1,5 @@
 // Reads a WhatsApp message with Groq, on its free tier (about 1,000 requests a day per model).
-// Same instructions and checks as Gemini. Texts come here first; photos only when Gemini fails (PDFs never).
+// Same instructions and checks as Gemini. Texts and photos come here first; PDFs go straight to Gemini.
 import { contextText, DECISION_SCHEMA, SYSTEM } from "@/lib/whatsapp/gemini";
 import type { Decision, WhatsappContext } from "@/lib/whatsapp/reader";
 import type { MediaType } from "@/lib/whatsapp/webhook";
