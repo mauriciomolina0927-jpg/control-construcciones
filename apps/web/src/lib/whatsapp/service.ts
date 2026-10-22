@@ -74,11 +74,11 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
   }
 
   const today = bogotaToday();
-  // Text goes to Groq first (fast, free) and then Gemini; photos go to Gemini first and Groq's image model
-  // after it. If every model fails or hits its free limit, the fixed rules read the text.
+  // Groq first (fast, free; Qwen reads the photos), then Gemini, which also reads PDFs.
+  // If every model fails or hits its free limit, the fixed rules read the text.
   const groq: [string, () => Promise<Decision>] = ["groq", () => interpretWithGroq(ctx, { text: message.text, media }, today)];
   const gemini: [string, () => Promise<Decision>] = ["gemini", () => interpretWithGemini(ctx, { text: message.text, media }, today)];
-  const readers = media ? [gemini, groq] : [groq, gemini];
+  const readers = [groq, gemini];
   let decision: Decision | null = null;
   for (const [name, read] of readers) {
     try {
