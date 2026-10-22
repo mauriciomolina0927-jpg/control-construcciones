@@ -46,12 +46,13 @@ export async function POST(request: NextRequest) {
 
 /** The shape of a webhook call, without its content: which field changed and which keys came. */
 function describePayload(payload: unknown): string {
-  type Change = { field?: string; value?: Record<string, unknown> & { messages?: Record<string, unknown>[]; statuses?: unknown[] } };
+  type Change = { field?: string; value?: Record<string, unknown> & { contacts?: Record<string, unknown>[]; messages?: Record<string, unknown>[]; statuses?: unknown[] } };
   const changes = ((payload as { entry?: { changes?: Change[] }[] })?.entry ?? []).flatMap((e) => e.changes ?? []);
   return JSON.stringify(changes.map((c) => ({
     field: c.field,
     value: Object.keys(c.value ?? {}),
     message: c.value?.messages?.[0] ? Object.keys(c.value.messages[0]) : undefined,
+    contact: c.value?.contacts?.[0] ? Object.keys(c.value.contacts[0]) : undefined,
     type: c.value?.messages?.[0]?.type,
     statuses: c.value?.statuses?.length,
   })));
