@@ -31,7 +31,11 @@ export async function sendText(to: string, body: string): Promise<string | null>
     headers: { Authorization: `Bearer ${token()}`, "Content-Type": "application/json" },
     body: JSON.stringify({ messaging_product: "whatsapp", to, type: "text", text: { body, preview_url: false } }),
   });
-  if (!response.ok) return null;
+  if (!response.ok) {
+    // Meta explains the failure in the body (expired token, missing permission, number not allowed).
+    console.error("whatsapp send failed", response.status, await response.text());
+    return null;
+  }
   const data = (await response.json()) as { messages?: { id?: string }[] };
   return data.messages?.[0]?.id ?? null;
 }
