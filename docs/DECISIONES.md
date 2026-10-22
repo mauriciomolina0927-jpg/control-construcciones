@@ -39,3 +39,9 @@ Cada decisión con fecha, qué se decidió y por qué. Las más recientes arriba
 
 | 2026-10-21 | El enlace del correo de entrada usa el flujo implícito y llega a `/auth/confirm` | En el plan gratis de Supabase no se puede editar el correo para poner un código, y el enlace PKCE fallaba al abrirlo en otro navegador o en el Gmail del celular |
 | 2026-10-21 | La primera entrada en cada celular es con correo y contraseña, no con el enlace al correo | El plan gratis de Supabase solo envía 2 correos por hora. Requiere apagar "Confirm email" en Supabase |
+
+## 2026-10-22 · Anular gastos por WhatsApp
+- Pedido por Mauricio. El bot pregunta "¿Anulo ...?" y solo anula si la misma persona responde "sí" en menos de 30 minutos.
+- Nada se borra: el gasto queda anulado (con quién y por qué en el motivo) o la sugerencia descartada; todo queda en `audit_log`. Casas liquidadas no se tocan.
+- Corregir = anular el malo y mandar el correcto como gasto nuevo.
+- Lectores: textos con Groq gratis → Gemini → reglas fijas; fotos con Gemini.
