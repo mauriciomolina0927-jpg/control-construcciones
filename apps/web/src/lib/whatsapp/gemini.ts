@@ -8,7 +8,8 @@ import type { MediaType } from "@/lib/whatsapp/webhook";
 const API = "https://generativelanguage.googleapis.com/v1beta/models";
 // The free tier's model names change over time; GEMINI_MODEL overrides these without a deploy of code.
 // Each model has its own free quota, so when one is busy (503) or out of quota (429) the next one is tried.
-const DEFAULT_MODELS = "gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.6-flash,gemini-3.1-flash-lite";
+// Lite models first: the messages are simple and the free flash models are the most saturated.
+const DEFAULT_MODELS = "gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-3.8-flash,gemini-3.6-flash";
 
 const nullable = (schema: object) => ({ ...schema, nullable: true });
 
@@ -110,7 +111,7 @@ export async function interpretWithGemini(
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": key },
         body,
-        signal: AbortSignal.timeout(12_000),
+        signal: AbortSignal.timeout(20_000),
       });
       if (attempt.ok) {
         response = attempt;
