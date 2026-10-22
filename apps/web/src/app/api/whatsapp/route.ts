@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
 
   // Answer right away so Meta does not resend, and do the work after the response.
   after(async () => {
-    for (const message of incomingMessages(payload)) {
+    const messages = incomingMessages(payload);
+    if (messages.length === 0) console.log("whatsapp webhook without messages (statuses or other events)");
+    for (const message of messages) {
       try {
         await handleMessage(message);
       } catch (error) {
