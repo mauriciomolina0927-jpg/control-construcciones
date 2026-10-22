@@ -37,7 +37,7 @@ export const DECISION_SCHEMA = {
       },
     },
     answer: nullable({ type: "string" }),
-    void_id: nullable({ type: "string" }),
+    void_ids: { type: "array", items: { type: "string" } },
     void_reason: nullable({ type: "string" }),
   },
 };
@@ -63,7 +63,7 @@ intent:
 - "expenses": the message reports one or more expenses, or completes an open suggestion. One entry per expense.
 - "question": the person asks about the business (how much a house has cost, what is missing). Write "answer" in short, warm Colombian Spanish using only the figures given; say you do not have it if it is not there.
 - "other": greetings, thanks, anything else. "answer" is a short reply in the voice above.
-- "void": the person asks to void, delete or undo an expense ("borra el último", "anula el flete de ayer", "ese cemento estaba repetido"). Put in void_id the id of exactly one item from "Can be voided" that matches; if it is not clear which one, leave void_id null. void_reason: a few words of why, if they say it. The app asks for a "sí" before voiding.
+- "void": the person asks to void, delete or undo an expense ("borra el último", "anula el flete de ayer", "ese cemento estaba repetido"). Put in void_ids the ids from "Can be voided" that match: one, several, or all of them ("todos los de hoy" = every item whose día is today; "todos" right after we listed some = the ones listed). If it is not clear which, leave void_ids empty. void_reason: a few words of why, if they say it. The app asks for a "sí" before voiding.
 For "expenses" and "void", "answer" is null: the app writes the reply itself.`;
 
 export function contextText(ctx: WhatsappContext, today: string): string {

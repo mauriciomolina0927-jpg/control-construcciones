@@ -65,9 +65,11 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
   // A "sí" right after "¿Anulo ...?" voids it; nothing else does.
   const lastOut = ctx.recent.filter((m) => m.direction === "out").at(-1);
   if (ctx.void_request && !media && lastOut?.body?.startsWith("¿Anulo") && isYes(message.text)) {
-    const { data: done, error } = await db.rpc("whatsapp_confirm_void", { token, phone: message.from, request: ctx.void_request.id });
-    if (error) throw new Error(`whatsapp_confirm_void: ${error.message}`);
-    await reply(done ? "✅ Anulado. Ya no cuenta en la casa; queda en el historial de la app." : "Ese ya no se puede anular (pasó la media hora o ya estaba anulado). Pídemelo otra vez.");
+    const { data: done, error } = await db.rpc("whatsapp_confirm_void_many", { token, phone: message.from, request: ctx.void_request.id });
+    if (error) throw new Error(`whatsapp_confirm_void_many: ${error.message}`);
+    await reply(done
+      ? `✅ Anulado${done > 1 ? `s ${done} gastos` : ""}. Ya no cuenta${done > 1 ? "n" : ""} en la casa; queda${done > 1 ? "n" : ""} en el historial de la app.`
+      : "Eso ya no se puede anular (pasó la media hora o ya estaba anulado). Pídemelo otra vez.");
     return;
   }
 
@@ -90,21 +92,27 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
   decision ??= interpret(ctx, { text: message.text, media }, today);
 
   if (decision.intent === "void") {
-    const target = ctx.voidable?.find((v) => v.id === decision.void_id);
-    if (!target) {
+    const ids = new Set(decision.void_ids ?? []);
+    const targets = (ctx.voidable ?? []).filter((v) => ids.has(v.id));
+    if (targets.length === 0) {
       const last = (ctx.voidable ?? []).slice(-3).reverse();
       await reply(last.length
-        ? `¿Cuál anulo? Dímelo con el valor o el día. Los últimos:\n${last.map((v) => `• ${describe(v, ctx)}`).join("\n")}`
+        ? `¿Cuál anulo? Dímelo con el valor o el día, o dime "todos los de hoy". Los últimos:\n${last.map((v) => `• ${describe(v, ctx)}`).join("\n")}`
         : "No veo gastos recientes para anular. Si es uno viejo, anúlalo en la app, en Dinero.");
       return;
     }
-    const { data: requestId, error } = await db.rpc("whatsapp_request_void", {
-      token, phone: message.from, target_kind: target.kind, target_id: target.id, reason: decision.void_reason ?? null,
+    const { data: requestId, error } = await db.rpc("whatsapp_request_void_many", {
+      token, phone: message.from, targets: targets.map((v) => ({ kind: v.kind, id: v.id })), reason: decision.void_reason ?? null,
     });
-    if (error) throw new Error(`whatsapp_request_void: ${error.message}`);
-    await reply(requestId
-      ? `¿Anulo ${describe(target, ctx)}? Responde *sí* para anularlo.`
-      : "Ese ya no se puede anular desde aquí. Revísalo en la app, en Dinero.");
+    if (error) throw new Error(`whatsapp_request_void_many: ${error.message}`);
+    if (!requestId) {
+      await reply("Eso ya no se puede anular desde aquí. Revísalo en la app, en Dinero.");
+      return;
+    }
+    const total = targets.reduce((sum, v) => sum + (v.amount ?? 0), 0);
+    await reply(targets.length === 1
+      ? `¿Anulo ${describe(targets[0]!, ctx)}? Responde *sí* para anularlo.`
+      : `¿Anulo estos ${targets.length} gastos por *${formatPesos(BigInt(total))}* en total?\n${targets.map((v) => `• ${describe(v, ctx)}`).join("\n")}\nResponde *sí* para anularlos.`);
     return;
   }
 

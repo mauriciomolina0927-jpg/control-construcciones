@@ -134,13 +134,17 @@ describe("asking to void", () => {
   it("points to the most recent one when they say the last", () => {
     const d = read("borra el último, estaba repetido", withVoidable);
     expect(d.intent).toBe("void");
-    expect(d.void_id).toBe("e2");
+    expect(d.void_ids).toEqual(["e2"]);
+  });
+
+  it("takes every expense of today", () => {
+    expect(read("anula todos los gastos del día de hoy", withVoidable).void_ids).toEqual(["e1", "e2"]);
   });
 
   it("is never read as a new expense, even with an amount", () => {
     const d = read("anula el cemento de 850", withVoidable);
     expect(d.intent).toBe("void");
     expect(d.expenses).toHaveLength(0);
-    expect(d.void_id).toBeNull();
+    expect(d.void_ids).toEqual([]);
   });
 });

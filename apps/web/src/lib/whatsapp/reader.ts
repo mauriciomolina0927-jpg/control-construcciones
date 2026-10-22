@@ -44,8 +44,8 @@ export type Decision = {
   intent: "expenses" | "question" | "void" | "other";
   expenses: ProposedExpense[];
   answer: string | null;
-  /** For intent "void": the id of one item in ctx.voidable, or null when it is not clear which. */
-  void_id?: string | null;
+  /** For intent "void": ids of items in ctx.voidable; empty when it is not clear which. */
+  void_ids?: string[];
   void_reason?: string | null;
 };
 
@@ -192,10 +192,18 @@ export function interpret(
 ): Decision {
   const text = message.text.trim();
   const plain = normalize(text);
-  if (/\b(anula|anular|anulalo|borra|borrar|borralo|elimina|eliminar|quita|quitalo)\b/.test(plain)) {
-    // The fixed rules only understand "the last one"; anything more specific is asked back.
-    const last = /\bultim/.test(plain) ? ctx.voidable?.at(-1) : undefined;
-    return { intent: "void", expenses: [], answer: null, void_id: last?.id ?? null, void_reason: null };
+  if (/\b(anula|anular|anulalo|anulalos|borra|borrar|borralo|borralos|elimina|eliminar|quita|quitalo)\b/.test(plain)) {
+    // The fixed rules only understand "the last one" and "all of today"; anything more specific is asked back.
+    const voidable = ctx.voidable ?? [];
+    let ids: string[] = [];
+    if (/\btod[oa]s?\b/.test(plain) && /\bhoy\b/.test(plain)) ids = voidable.filter((v) => v.spent_on === today).map((v) => v.id);
+    else if (/\bultim/.test(plain) && voidable.length > 0) ids = [voidable.at(-1)!.id];
+    return { intent: "void", expenses: [], answer: null, void_ids: ids, void_reason: null };
+  }
+  // "todos" right after we listed the last ones means those.
+  const lastOut = ctx.recent.filter((m) => m.direction === "out").at(-1);
+  if (/^tod[oa]s\b/.test(plain) && lastOut?.body?.startsWith("¿Cuál anulo")) {
+    return { intent: "void", expenses: [], answer: null, void_ids: (ctx.voidable ?? []).slice(-3).map((v) => v.id), void_reason: null };
   }
   const latest = ctx.open.at(-1);
 
