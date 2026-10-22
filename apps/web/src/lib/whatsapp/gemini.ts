@@ -14,7 +14,7 @@ const DEFAULT_MODELS = "gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-3.8-f
 const nullable = (schema: object) => ({ ...schema, nullable: true });
 
 // Gemini's response schema (an OpenAPI subset: "nullable" instead of a null type).
-const DECISION_SCHEMA = {
+export const DECISION_SCHEMA = {
   type: "object",
   required: ["intent", "expenses", "answer"],
   properties: {
@@ -40,7 +40,7 @@ const DECISION_SCHEMA = {
   },
 };
 
-const SYSTEM = `${SOUL}
+export const SYSTEM = `${SOUL}
 
 Technical rules:
 You read WhatsApp messages that the partners of a small family construction business in Atlántico, Colombia send to the company number. They report what they spent on the houses they build, sometimes with a photo of the receipt, and sometimes ask how a house is going.
@@ -63,7 +63,7 @@ intent:
 - "other": greetings, thanks, anything else. "answer" is a short reply in the voice above.
 For "expenses", "answer" is null: the app writes the confirmation itself.`;
 
-function contextText(ctx: WhatsappContext, today: string): string {
+export function contextText(ctx: WhatsappContext, today: string): string {
   const houses = ctx.houses
     .map((h) => `- ${h.name} (id ${h.id}, etapa ${h.stage}): lote $${h.lot}, obra $${h.construction}, gastos sin recibo ${h.without_receipt}`)
     .join("\n");
