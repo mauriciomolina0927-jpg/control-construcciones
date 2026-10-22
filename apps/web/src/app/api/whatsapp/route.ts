@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   // Answer right away so Meta does not resend, and do the work after the response.
   after(async () => {
     const messages = incomingMessages(payload);
-    if (messages.length === 0) console.log("whatsapp webhook without messages (statuses or other events)");
+    if (messages.length === 0) console.log("whatsapp webhook without messages", describePayload(payload));
     for (const message of messages) {
       try {
         await handleMessage(message);
@@ -42,4 +42,17 @@ export async function POST(request: NextRequest) {
     }
   });
   return new Response("OK", { status: 200 });
+}
+
+/** The shape of a webhook call, without its content: which field changed and which keys came. */
+function describePayload(payload: unknown): string {
+  type Change = { field?: string; value?: Record<string, unknown> & { messages?: Record<string, unknown>[]; statuses?: unknown[] } };
+  const changes = ((payload as { entry?: { changes?: Change[] }[] })?.entry ?? []).flatMap((e) => e.changes ?? []);
+  return JSON.stringify(changes.map((c) => ({
+    field: c.field,
+    value: Object.keys(c.value ?? {}),
+    message: c.value?.messages?.[0] ? Object.keys(c.value.messages[0]) : undefined,
+    type: c.value?.messages?.[0]?.type,
+    statuses: c.value?.statuses?.length,
+  })));
 }
