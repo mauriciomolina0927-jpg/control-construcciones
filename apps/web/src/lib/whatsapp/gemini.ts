@@ -7,7 +7,7 @@ import type { MediaType } from "@/lib/whatsapp/webhook";
 const API = "https://generativelanguage.googleapis.com/v1beta/models";
 // The free tier's model names change over time; GEMINI_MODEL overrides these without a deploy of code.
 // Each model has its own free quota, so when one is busy (503) or out of quota (429) the next one is tried.
-const DEFAULT_MODELS = "gemini-3.8-flash,gemini-3.8-flash-lite,gemini-2.5-flash-lite";
+const DEFAULT_MODELS = "gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.6-flash,gemini-3.1-flash-lite";
 
 const nullable = (schema: object) => ({ ...schema, nullable: true });
 
