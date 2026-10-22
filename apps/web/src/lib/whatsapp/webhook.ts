@@ -22,9 +22,11 @@ type Payload = {
   entry?: {
     changes?: {
       value?: {
+        contacts?: { wa_id?: string; user_id?: string }[];
         messages?: {
           id?: string;
           from?: string;
+          from_user_id?: string;
           type?: string;
           text?: { body?: string };
           image?: { id?: string; mime_type?: string; caption?: string };
@@ -37,14 +39,20 @@ type Payload = {
   }[];
 };
 
-/** The messages in a webhook call. Delivery receipts and anything without a sender are skipped. */
+/** The messages in a webhook call. Delivery receipts and anything without a sender are skipped.
+ * Some accounts come with from_user_id instead of from; then the phone is the matching contact's wa_id. */
 export function incomingMessages(payload: unknown): IncomingMessage[] {
   const out: IncomingMessage[] = [];
   for (const entry of (payload as Payload)?.entry ?? []) {
     for (const change of entry.changes ?? []) {
+      const contacts = change.value?.contacts ?? [];
       for (const m of change.value?.messages ?? []) {
-        if (!m.id || !m.from) continue;
-        const base = { id: m.id, from: m.from.replace(/\D/g, ""), mediaId: null, mimeType: null };
+        const from =
+          m.from ??
+          contacts.find((c) => m.from_user_id && c.user_id === m.from_user_id)?.wa_id ??
+          (contacts.length === 1 ? contacts[0].wa_id : undefined);
+        if (!m.id || !from) continue;
+        const base = { id: m.id, from: from.replace(/\D/g, ""), mediaId: null, mimeType: null };
         if (m.type === "text") {
           out.push({ ...base, kind: "text", text: m.text?.body ?? "" });
         } else if (m.type === "image" || m.type === "document") {

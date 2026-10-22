@@ -134,3 +134,15 @@ describe("checking what the reader proposed", () => {
     expect(checkProposal(proposal({ update_id: "otra", amount: 5000, house_id: "prado", category: "Materiales" }), ctx, today).updateId).toBeNull();
   });
 });
+
+describe("incomingMessages without from", () => {
+  it("takes the phone from the contact when only from_user_id comes", () => {
+    const payload = { entry: [{ changes: [{ value: {
+      contacts: [{ wa_id: "573008051142", user_id: "CO.123" }],
+      messages: [{ id: "wamid.1", from_user_id: "CO.123", type: "text", text: { body: "hola" } }],
+    } }] }] };
+    expect(incomingMessages(payload)).toEqual([
+      { id: "wamid.1", from: "573008051142", kind: "text", text: "hola", mediaId: null, mimeType: null },
+    ]);
+  });
+});
