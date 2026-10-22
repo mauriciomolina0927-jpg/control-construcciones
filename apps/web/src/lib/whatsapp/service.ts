@@ -30,7 +30,11 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
 
   const { data: context, error: contextError } = await db.rpc("whatsapp_context", { token, phone: message.from });
   if (contextError) throw new Error(`whatsapp_context: ${contextError.message}`);
-  if (!context) return;
+  if (!context) {
+    // Only the last digits: enough to tell whose number is missing in Socios without logging it whole.
+    console.warn("whatsapp unknown phone ending in", message.from.slice(-4));
+    return;
+  }
   const ctx = context as WhatsappContext;
 
   let media: { type: MediaType; base64: string } | null = null;
