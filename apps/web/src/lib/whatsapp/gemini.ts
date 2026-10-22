@@ -5,8 +5,9 @@ import type { Decision, WhatsappContext } from "@/lib/whatsapp/reader";
 import type { MediaType } from "@/lib/whatsapp/webhook";
 
 const API = "https://generativelanguage.googleapis.com/v1beta/models";
-// The free tier's model names change over time; GEMINI_MODEL overrides this one without a deploy of code.
-const DEFAULT_MODEL = "gemini-3.8-flash";
+// The free tier's model names change over time; GEMINI_MODEL overrides these without a deploy of code.
+// Each model has its own free quota, so when one is busy (503) or out of quota (429) the next one is tried.
+const DEFAULT_MODELS = "gemini-3.8-flash,gemini-3.8-flash-lite,gemini-2.5-flash-lite";
 
 const nullable = (schema: object) => ({ ...schema, nullable: true });
 
@@ -86,23 +87,37 @@ export async function interpretWithGemini(
 ): Promise<Decision> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("Missing environment variable GEMINI_API_KEY");
-  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
+  const models = (process.env.GEMINI_MODEL || DEFAULT_MODELS).split(",").map((m) => m.trim()).filter(Boolean);
 
   const parts: object[] = [];
   if (message.media) parts.push({ inline_data: { mime_type: message.media.type, data: message.media.base64 } });
   parts.push({ text: `${contextText(ctx, today)}\n\nNew message:\n${message.text || "(only the attachment)"}` });
 
-  const response = await fetch(`${API}/${encodeURIComponent(model)}:generateContent`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: SYSTEM }] },
-      contents: [{ role: "user", parts }],
-      generationConfig: { responseMimeType: "application/json", responseSchema: DECISION_SCHEMA },
-    }),
-    signal: AbortSignal.timeout(30_000),
+  const body = JSON.stringify({
+    system_instruction: { parts: [{ text: SYSTEM }] },
+    contents: [{ role: "user", parts }],
+    generationConfig: { responseMimeType: "application/json", responseSchema: DECISION_SCHEMA },
   });
-  if (!response.ok) throw new Error(`Gemini ${response.status}: ${(await response.text()).slice(0, 300)}`);
+  let response: Response | null = null;
+  const failures: string[] = [];
+  for (const model of models) {
+    try {
+      const attempt = await fetch(`${API}/${encodeURIComponent(model)}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body,
+        signal: AbortSignal.timeout(12_000),
+      });
+      if (attempt.ok) {
+        response = attempt;
+        break;
+      }
+      failures.push(`${model} ${attempt.status}: ${(await attempt.text()).slice(0, 150)}`);
+    } catch (error) {
+      failures.push(`${model}: ${error instanceof Error ? error.name : String(error)}`);
+    }
+  }
+  if (!response) throw new Error(`Gemini failed on every model: ${failures.join(" | ")}`);
 
   const data = (await response.json()) as {
     candidates?: { finishReason?: string; content?: { parts?: { text?: string }[] } }[];
