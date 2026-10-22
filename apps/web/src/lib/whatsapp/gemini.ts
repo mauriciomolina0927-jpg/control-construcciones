@@ -2,6 +2,7 @@
 // the database's own lists (proposal.ts) and still waits for a person in the app.
 import { CATEGORIES } from "@/lib/expenses";
 import type { Decision, WhatsappContext } from "@/lib/whatsapp/reader";
+import { SOUL } from "@/lib/whatsapp/soul";
 import type { MediaType } from "@/lib/whatsapp/webhook";
 
 const API = "https://generativelanguage.googleapis.com/v1beta/models";
@@ -38,7 +39,10 @@ const DECISION_SCHEMA = {
   },
 };
 
-const SYSTEM = `You read WhatsApp messages that the partners of a small family construction business in Atlántico, Colombia send to the company number. They report what they spent on the houses they build, sometimes with a photo of the receipt, and sometimes ask how a house is going.
+const SYSTEM = `${SOUL}
+
+Technical rules:
+You read WhatsApp messages that the partners of a small family construction business in Atlántico, Colombia send to the company number. They report what they spent on the houses they build, sometimes with a photo of the receipt, and sometimes ask how a house is going.
 
 Your output is a proposal only. Nothing you return becomes a record until a person reviews it in the app, so never guess to fill a gap: leave a field null when the message and the receipt do not say it.
 
@@ -55,7 +59,7 @@ Fields:
 intent:
 - "expenses": the message reports one or more expenses, or completes an open suggestion. One entry per expense.
 - "question": the person asks about the business (how much a house has cost, what is missing). Write "answer" in short, warm Colombian Spanish using only the figures given; say you do not have it if it is not there.
-- "other": greetings, thanks, anything else. "answer" is a one-line friendly reply in Spanish, mentioning they can send expenses with a photo of the receipt.
+- "other": greetings, thanks, anything else. "answer" is a short reply in the voice above.
 For "expenses", "answer" is null: the app writes the confirmation itself.`;
 
 function contextText(ctx: WhatsappContext, today: string): string {

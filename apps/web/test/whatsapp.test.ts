@@ -103,7 +103,7 @@ describe("checking what the reader proposed", () => {
         "Listo, Miguel. Lo dejé para revisar en la app:",
         "",
         `*${formatPesos(850000n)}* · Materiales`,
-        "Casa El Prado · Ferretería X",
+        "El Prado · Ferretería X",
         "Pagó: Miguel · quedó fiado",
         "",
         "Si algo está mal, escríbeme y lo corrijo.",

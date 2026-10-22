@@ -92,7 +92,7 @@ export function confirmationText(saved: SuggestionSummary, ctx: WhatsappContext)
     return `¿Qué fue? Por ejemplo: materiales, mano de obra, transporte o herramientas.`;
   }
 
-  const detail = [house ? `Casa ${house}` : null, saved.supplier_name].filter(Boolean).join(" · ");
+  const detail = [house, saved.supplier_name].filter(Boolean).join(" · ");
   return [
     `Listo, ${ctx.partner_name}. Lo dejé para revisar en la app:`,
     "",
