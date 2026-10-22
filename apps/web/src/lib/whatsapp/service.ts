@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { supabaseKey, supabaseUrl } from "@/lib/env";
 import { bogotaToday, detectReceiptType, MAX_RECEIPT_BYTES } from "@/lib/expenses";
 import { interpretWithGemini } from "@/lib/whatsapp/gemini";
+import { interpretWithGroq } from "@/lib/whatsapp/groq";
 import { downloadMedia, sendText } from "@/lib/whatsapp/meta";
 import { checkProposal, confirmationText } from "@/lib/whatsapp/proposal";
 import { interpret, type Decision, type WhatsappContext } from "@/lib/whatsapp/reader";
@@ -61,14 +62,22 @@ export async function handleMessage(message: IncomingMessage): Promise<void> {
   }
 
   const today = bogotaToday();
-  // Gemini reads photos and free text; if it fails or hits the free tier's daily limit, the fixed rules read the text.
-  let decision: Decision;
-  try {
-    decision = await interpretWithGemini(ctx, { text: message.text, media }, today);
-  } catch (error) {
-    console.error("whatsapp gemini failed, using the fixed rules", error);
-    decision = interpret(ctx, { text: message.text, media }, today);
+  // Text goes to Groq first (fast, free) and then Gemini; photos go to Gemini only, which reads images.
+  // If every model fails or hits its free limit, the fixed rules read the text.
+  const readers: [string, () => Promise<Decision>][] = [];
+  if (!media && message.text) readers.push(["groq", () => interpretWithGroq(ctx, message.text, today)]);
+  readers.push(["gemini", () => interpretWithGemini(ctx, { text: message.text, media }, today)]);
+  let decision: Decision | null = null;
+  for (const [name, read] of readers) {
+    try {
+      decision = await read();
+      console.log("whatsapp read by", name);
+      break;
+    } catch (error) {
+      console.error(`whatsapp ${name} failed`, error);
+    }
   }
+  decision ??= interpret(ctx, { text: message.text, media }, today);
 
   if (decision.intent !== "expenses" || decision.expenses.length === 0) {
     if (decision.answer) await reply(decision.answer);
