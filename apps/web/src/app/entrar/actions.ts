@@ -46,12 +46,18 @@ async function create(state: SignInState, email: string, password: string, repea
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({ email, password });
   // Supabase answers an existing email with a user that has no identities instead of an error.
-  if (error || !data.session || data.user?.identities?.length === 0) {
+  const exists = error?.code === "user_already_exists" || data.user?.identities?.length === 0;
+  if (exists) {
     return {
       ...state,
       email,
       error: "Ese correo ya tiene cuenta. Entra con tu contraseña, o con el enlace al correo si nunca la creaste.",
     };
+  }
+  if (error || !data.session) {
+    // No session without an error means "Confirm email" is still on in Supabase.
+    console.error("sign up failed", error?.code ?? "no session");
+    return { ...state, email, error: "No pudimos crear la contraseña. Avísale a Mauricio." };
   }
   await supabase.rpc("accept_invitations");
   redirect("/pin");
