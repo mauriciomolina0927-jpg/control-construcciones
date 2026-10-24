@@ -103,7 +103,7 @@ export default async function HomePage() {
       attention.push({
         key: `${r.id}-${p.partnerId}`,
         tone: "accent",
-        title: `A ${name.get(p.partnerId)} le deben ${formatMillions(p.balance)}`,
+        title: `A ${name.get(p.partnerId)} le deben ${formatPesos(p.balance)}`,
         detail: `${r.name} · plata de la venta`,
         href: `/casas/${r.id}/liquidacion`,
         action: "Ver reparto",
@@ -136,14 +136,14 @@ export default async function HomePage() {
           <Kpi
             featured
             label="Capital en las casas"
-            value={formatMillions(capital)}
-            foot={[...byPartner].map(([n, v]) => `${n} ${formatMillions(v)}`).join(" · ") || "Sin aportes todavía"}
+            value={formatPesos(capital)}
+            foot={[...byPartner].map(([n, v]) => `${n} ${formatPesos(v)}`).join(" · ") || "Sin aportes todavía"}
           />
         </div>
-        <Kpi label="Gastado este mes" value={formatMillions(thisMonth.total)} foot={thisMonthCount === 1 ? "1 gasto" : `${thisMonthCount} gastos`} />
+        <Kpi label="Gastado este mes" value={formatPesos(thisMonth.total)} foot={thisMonthCount === 1 ? "1 gasto" : `${thisMonthCount} gastos`} />
         <Kpi label="Gastos sin soporte" value={String(withoutReceipt)} foot={withoutReceipt ? "Falta la foto del recibo" : "Todo con soporte"} />
         <div className="col-span-2 md:col-span-1">
-          <Kpi label="Por cobrar a compradores" value={formatMillions(toCollect)} foot="Precio pactado menos lo recibido" />
+          <Kpi label="Por cobrar a compradores" value={formatPesos(toCollect)} foot="Precio pactado menos lo recibido" />
         </div>
       </div>
 
@@ -168,10 +168,10 @@ export default async function HomePage() {
                   </span>
                   <span className="text-sm text-foreground/60 md:text-foreground">
                     <span className="md:hidden">Invertido </span>
-                    {formatMillions(r.finance.settlement.totalCapital)}
+                    {formatPesos(r.finance.settlement.totalCapital)}
                   </span>
                   <span className="justify-self-end text-sm text-foreground/60 md:justify-self-start">
-                    {r.price > 0n ? `Precio ${formatMillions(r.price)}` : "Sin precio"}
+                    {r.price > 0n ? `Precio ${formatPesos(r.price)}` : "Sin precio"}
                   </span>
                   <span aria-hidden="true" className="hidden text-foreground/30 md:block">
                     ›

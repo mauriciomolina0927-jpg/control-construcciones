@@ -5,7 +5,7 @@ import { Bar, Card, Kpi } from "@/components/ui";
 import { KIND_LABELS, kindOf } from "@/lib/expenses";
 import { loadHouseFinance } from "@/lib/houses";
 import { requireMembership } from "@/lib/membership";
-import { formatMillions, formatPesos, toPesos } from "@/lib/money";
+import { formatPesos, toPesos } from "@/lib/money";
 import { PICKABLE_STAGES, STAGE_LABELS, type Stage } from "@/lib/stages";
 import { changeStage } from "../actions";
 
@@ -89,19 +89,19 @@ export default async function HousePage({ params }: PageProps<"/casas/[id]">) {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         <Kpi
           label="Invertido"
-          value={formatMillions(settlement.totalCapital)}
-          foot={`Lote ${formatMillions(byKind.lot)} · obra ${formatMillions(byKind.construction)}`}
+          value={formatPesos(settlement.totalCapital)}
+          foot={`Lote ${formatPesos(byKind.lot)} · obra ${formatPesos(byKind.construction)}`}
         />
-        <Kpi label="Gastado en obra" value={formatMillions(byKind.construction)} foot={`${rows.length} gastos · ${finance.expensesWithoutReceipt} sin soporte`} />
-        <Kpi label={sale ? "Precio pactado" : "Precio esperado"} value={price ? formatMillions(price) : "Sin definir"} foot={sale ? sale.buyer_name : "Todavía sin comprador"} />
+        <Kpi label="Gastado en obra" value={formatPesos(byKind.construction)} foot={`${rows.length} gastos · ${finance.expensesWithoutReceipt} sin soporte`} />
+        <Kpi label={sale ? "Precio pactado" : "Precio esperado"} value={price ? formatPesos(price) : "Sin definir"} foot={sale ? sale.buyer_name : "Todavía sin comprador"} />
         <Kpi
           featured
           label="Ganancia estimada"
           value={
             projected
               ? projected.capitalRecovered
-                ? formatMillions(projected.totalProfit)
-                : formatMillions(projected.netReceived - projected.totalCapital)
+                ? formatPesos(projected.totalProfit)
+                : formatPesos(projected.netReceived - projected.totalCapital)
               : "Sin precio"
           }
           foot={projected ? "Si se vende a ese precio · mitad y mitad" : "Pon un precio esperado para calcularla"}
@@ -177,11 +177,11 @@ export default async function HousePage({ params }: PageProps<"/casas/[id]">) {
                 <div className="flex justify-between gap-4">
                   <div>
                     <p className="text-[13px] text-foreground/60">Pactado</p>
-                    <p className="mt-0.5 text-xl font-medium tracking-tight">{formatMillions(toPesos(sale.agreed_price))}</p>
+                    <p className="mt-0.5 text-lg font-medium tracking-tight md:text-xl">{formatPesos(toPesos(sale.agreed_price))}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-[13px] text-foreground/60">Recibido</p>
-                    <p className="mt-0.5 text-xl font-medium tracking-tight">{formatMillions(settlement.received)}</p>
+                    <p className="mt-0.5 text-lg font-medium tracking-tight md:text-xl">{formatPesos(settlement.received)}</p>
                   </div>
                 </div>
                 <Bar tone="accent" percent={Number((settlement.received * 100n) / (toPesos(sale.agreed_price) || 1n))} />
@@ -233,10 +233,10 @@ export default async function HousePage({ params }: PageProps<"/casas/[id]">) {
                     {name.get(p.partnerId)}
                   </span>
                   <span className="text-right">
-                    <span className="font-medium">{formatMillions(p.contributed + p.saleCostsPaid)}</span>
+                    <span className="font-medium">{formatPesos(p.contributed + p.saleCostsPaid)}</span>
                     {projected && (
                       <span className="block text-xs text-foreground/60">
-                        le tocaría {formatMillions(projected.partners[i]!.entitled)}
+                        le tocaría {formatPesos(projected.partners[i]!.entitled)}
                       </span>
                     )}
                   </span>
