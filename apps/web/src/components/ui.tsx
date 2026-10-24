@@ -94,12 +94,15 @@ export function Kpi({
 }) {
   return (
     <section
-      className={`flex min-w-0 flex-col gap-3 rounded-[20px] p-5 ${
+      className={`@container flex min-w-0 flex-col gap-3 rounded-[20px] p-5 ${
         featured ? "bg-linear-150 from-[#ff8352] via-accent to-[#e04812] text-white" : "border border-line bg-white"
       }`}
     >
       <p className={`text-[13px] ${featured ? "text-white/85" : "text-foreground/60"}`}>{label}</p>
-      <p className="text-[28px] leading-none font-medium tracking-tight">{value}</p>
+      {/* Full peso amounts are long: shrink the figure to fit a half-width card on a phone, never above 28px. */}
+      <p className="leading-none font-medium tracking-tight whitespace-nowrap" style={{ fontSize: `min(28px, ${(180 / value.length).toFixed(1)}cqi)` }}>
+        {value}
+      </p>
       {foot && <p className={`text-xs ${featured ? "text-white/85" : "text-foreground/60"}`}>{foot}</p>}
     </section>
   );

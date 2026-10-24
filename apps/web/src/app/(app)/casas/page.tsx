@@ -3,7 +3,7 @@ import { StageChip } from "@/components/stage-chip";
 import { Card, LinkButton, PageTitle } from "@/components/ui";
 import { loadHouseFinance } from "@/lib/houses";
 import { requireMembership } from "@/lib/membership";
-import { formatMillions, toPesos } from "@/lib/money";
+import { formatPesos, toPesos } from "@/lib/money";
 import type { Stage } from "@/lib/stages";
 
 export default async function HousesPage() {
@@ -46,7 +46,7 @@ export default async function HousesPage() {
               <dl className="grid grid-cols-2 gap-3">
                 <div>
                   <dt className="text-[13px] text-foreground/60">Invertido</dt>
-                  <dd className="mt-0.5 text-xl font-medium tracking-tight">{formatMillions(h.finance.settlement.totalCapital)}</dd>
+                  <dd className="mt-0.5 text-lg font-medium tracking-tight md:text-xl">{formatPesos(h.finance.settlement.totalCapital)}</dd>
                 </div>
                 <div>
                   <dt className="text-[13px] text-foreground/60">Sin soporte</dt>
